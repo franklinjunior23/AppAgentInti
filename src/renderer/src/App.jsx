@@ -1,12 +1,21 @@
-import Header from "./components/Header"
+import Header from './components/Header'
+import { useEffect, useState } from 'react'
 
 function App() {
-  return (
-    <div className="">
-      <Header/>
-      <h1 className="text-3xl font-bold underline text-">
+  const [EstadoInfo, setEstadoInfo] = useState([])
+  useEffect(() => {
+    async function getInfo() {
+      const data = await window.SistemInfo.GetInfoSystem()
+      setEstadoInfo(data)
 
-      </h1>
+    }
+    getInfo()
+  }, [])
+  console.log(EstadoInfo)
+  return (
+    <div className="p-4">
+      <Header />
+      <main className="ml-[260px]"></main>
     </div>
   )
 }

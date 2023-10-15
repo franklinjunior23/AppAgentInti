@@ -2,24 +2,34 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { collectSystemInfo } from './SystemInfo'
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 900,
-    height: 630,
+    height: 600,
     show: false,
     resizable: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
+      nodeIntegration: false,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
-
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
+  })
+  mainWindow.webContents.on('did-finish-load', () => {
+    collectSystemInfo()
+      .then((data) => {
+        mainWindow.webContents.send('SystemInfo', [data])
+      })
+      .catch((error) => {
+        console.error('Error al recopilar información del sistema:', error)
+      })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -49,7 +59,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
   createWindow()
 
   app.on('activate', function () {
