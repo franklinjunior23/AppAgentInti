@@ -1,18 +1,23 @@
 import si from 'systeminformation'
 import os from 'os'
+import { EventLogger } from 'node-windows'
 
 export async function collectSystemInfo() {
   try {
+    const eventLog = new EventLogger('hola mundo')
+    
+    eventLog.warn('Watch out!')
     const systemReport = await si.get({
       system: '*',
       osInfo: '*',
       bios: '*',
       baseboard: '*',
       cpu: '*',
-      cpuCache: '*',
-      memory: '*',
+      //  cpuCache: '*',
+      memLayout: '*', // Agregado para obtener información sobre la memoria RAM
+      memoryLayout: '*', // Agregado para obtener información detallada sobre la memoria RAM
       graphics: '*',
-      disks: '*',
+      blockDevices: '*',
       battery: '*',
       audio: '*',
       networkInterfaces: '*',
@@ -22,29 +27,14 @@ export async function collectSystemInfo() {
       virtualization: '*',
       bluetooth: '*',
       wifi: '*',
+      usb: '*',
       users: '*',
-      time: '*'
+      time: '*',
+      cpuTemperature: '*'
     })
-
+    console.log(eventLog)
     // Agregar información adicional
     systemReport.currentUser = os.userInfo().username
-
-    const diskLayout = await si.diskLayout()
-    systemReport.disks = diskLayout.map((disk) => ({
-      name: disk.name,
-      vendor: disk.vendor,
-      size: disk.size,
-      type: disk.type,
-      interfaceType: disk.interfaceType,
-      rpm: disk.rpm,
-      partitions: disk.partitions.map((partition) => ({
-        name: partition.name,
-        size: partition.size,
-        type: partition.type,
-        mount: partition.mount,
-        fsType: partition.fsType
-      }))
-    }))
 
     return systemReport
   } catch (error) {

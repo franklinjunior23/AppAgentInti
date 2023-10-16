@@ -7,7 +7,6 @@ function App() {
     async function getInfo() {
       const data = await window.SistemInfo.GetInfoSystem()
       setEstadoInfo(data)
-
     }
     getInfo()
   }, [])
