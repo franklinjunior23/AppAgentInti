@@ -23,13 +23,16 @@ function createWindow() {
     mainWindow.show()
   })
   mainWindow.webContents.on('did-finish-load', () => {
-    collectSystemInfo()
-      .then((data) => {
-        mainWindow.webContents.send('SystemInfo', [data])
-      })
-      .catch((error) => {
-        console.error('Error al recopilar información del sistema:', error)
-      })
+    setInterval(() => {
+      collectSystemInfo()
+        .then((data) => {
+          mainWindow.webContents.send('SystemInfo', [data])
+        })
+        .catch((error) => {
+          console.error('Error al recopilar información del sistema:', error)
+        })
+      // 4minutos
+    }, 240000)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
