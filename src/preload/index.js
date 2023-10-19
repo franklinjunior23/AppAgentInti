@@ -9,12 +9,19 @@ const api = {}
 // just add to the DOM global.
 
 ipcRenderer.on('SystemInfo', (event, data) => {
-  window.SystemInfo = data
   console.log(data)
 })
-contextBridge.exposeInMainWorld('SistemInfo', {
-  GetInfoSystem: () => {
-    return ipcRenderer.send('SystemInfo')
+contextBridge.exposeInMainWorld('systemAPI', {
+  getInfo: () => {
+    return new Promise((resolve) => {
+      // Esperar 5 segundos antes de devolver la información del sistema
+      setTimeout(() => {
+        ipcRenderer.once('SystemInfo', (event, systemReport) => {
+          resolve(systemReport)
+        })
+        ipcRenderer.send('SystemInfo')
+      }, 5000)
+    })
   }
 })
 if (process.contextIsolated) {

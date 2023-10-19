@@ -5,7 +5,7 @@ import { EventLogger } from 'node-windows'
 export async function collectSystemInfo() {
   try {
     const eventLog = new EventLogger('hola mundo')
-    
+
     eventLog.warn('Watch out!')
     const systemReport = await si.get({
       system: '*',
