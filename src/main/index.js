@@ -32,7 +32,7 @@ function createWindow() {
         .catch((error) => {
           console.error('Error al recopilar información del sistema:', error)
         })
-    }, 4000)
+    }, 24000)
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
