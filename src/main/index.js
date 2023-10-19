@@ -3,7 +3,6 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { collectSystemInfo } from './SystemInfo'
-import { setTimeout } from 'timers'
 
 function createWindow() {
   // Create the browser window.
@@ -15,7 +14,7 @@ function createWindow() {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false,
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     }
@@ -24,15 +23,13 @@ function createWindow() {
     mainWindow.show()
   })
   mainWindow.webContents.on('did-finish-load', () => {
-    setTimeout(() => {
-      collectSystemInfo()
-        .then((data) => {
-          mainWindow.webContents.send('SystemInfo', [data])
-        })
-        .catch((error) => {
-          console.error('Error al recopilar información del sistema:', error)
-        })
-    }, 24000)
+    collectSystemInfo()
+      .then((data) => {
+        mainWindow.webContents.send('SystemInfo', [data])
+      })
+      .catch((error) => {
+        console.error('Error al recopilar información del sistema:', error)
+      })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

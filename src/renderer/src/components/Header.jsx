@@ -5,16 +5,17 @@ import {
   IconSettings,
   IconSmartHome
 } from '@tabler/icons-react'
-import { BarStorage } from '../store'
+import { BarStorage } from '../store/HeadBar'
 import { Link } from 'react-router-dom'
 
 function Header() {
+  const { bar } = BarStorage()
   const PathLinks = [
     { name: 'Dashboard', path: '/', icon: <IconSmartHome /> },
     { name: 'Setting', path: '/Setting', icon: <IconSettings /> },
     { name: 'Help', path: '/Help', icon: <IconInfoSquareRounded /> }
   ]
-  const { bar } = BarStorage()
+
   return (
     <aside className=" fixed h-screen left-0 top-0 w-[245px] py-4 pl-5">
       <header className="bg-[#292929]/80 w-[100%] h-[100%] rounded-xl p-4 flex flex-col justify-between">

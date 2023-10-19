@@ -21,7 +21,6 @@ function Home() {
     }
     getInfo()
   }, [])
-  console.log(data[0])
   if (data.length === 0) return <h3 className="text-center mt-5">Cargando ....</h3>
   return (
     <>

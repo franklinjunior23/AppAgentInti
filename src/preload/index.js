@@ -20,16 +20,14 @@ contextBridge.exposeInMainWorld('SistemInfo', {
 ipcRenderer.on('SystemInfo', (event, data) => {
   console.log(data)
 })
+
 contextBridge.exposeInMainWorld('systemAPI', {
   getInfo: () => {
     return new Promise((resolve) => {
-      // Esperar 5 segundos antes de devolver la información del sistema
-      setTimeout(() => {
-        ipcRenderer.once('SystemInfo', (event, systemReport) => {
-          resolve(systemReport)
-        })
-        ipcRenderer.send('SystemInfo')
-      }, 5000)
+      // Escuchar el evento 'system-info' enviado desde el proceso principal
+      ipcRenderer.once('SystemInfo', (event, systemReport) => {
+        resolve(systemReport)
+      })
     })
   }
 })
