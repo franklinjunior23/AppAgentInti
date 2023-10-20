@@ -1,13 +1,15 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, BrowserRouter, Routes } from 'react-router-dom'
 import { Home, Info, Setting } from './screen'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/Setting" element={<Setting />} />
-      <Route path="/Help" element={<Info />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/Setting" element={<Setting />} />
+        <Route path="/Help" element={<Info />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
