@@ -33,7 +33,6 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-
 NO FUNCIONA EL REACT ROUTER DOM EN ELECTRON ---PROBLEMAS
 
 <BROWSERROUTER>
@@ -42,8 +41,6 @@ NO FUNCIONA EL REACT ROUTER DOM EN ELECTRON ---PROBLEMAS
 
 ## no funciona
 
-
 <HashRouter>
 si funciona en el app.js
 </HashRouter>
-

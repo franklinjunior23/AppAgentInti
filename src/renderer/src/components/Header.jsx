@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
 function Header() {
   const { bar } = BarStorage()
   const PathLinks = [
-    { name: 'Dashboard', path: '/', icon: <IconSmartHome /> },
+    { name: 'Dashboard', path: '/Dashboard', icon: <IconSmartHome /> },
     { name: 'Setting', path: '/Setting', icon: <IconSettings /> },
     { name: 'Help', path: '/Help', icon: <IconInfoSquareRounded /> }
   ]

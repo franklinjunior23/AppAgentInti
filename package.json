@@ -22,6 +22,7 @@
     "@tabler/icons-react": "^2.39.0",
     "electron-updater": "^6.1.1",
     "node-windows": "^1.0.0-beta.8",
+    "react-hook-form": "^7.47.0",
     "react-router-dom": "^6.17.0",
     "systeminformation": "^5.21.11",
     "zustand": "^4.4.3"
