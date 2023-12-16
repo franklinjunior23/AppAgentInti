@@ -19,6 +19,6 @@ export default defineConfig({
         '@renderer': resolve('src/renderer/src')
       }
     },
-    plugins: [react(), tailwindcss('./tailwind.config.js'), autoprefixer]
+    plugins: [react(), tailwindcss('tailwind.config.js'), autoprefixer]
   }
 })

@@ -10,6 +10,8 @@ function createWindow() {
     width: 900,
     height: 600,
     show: false,
+    // @Ventana de la applicacion;
+    //frame: false,
     resizable: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),

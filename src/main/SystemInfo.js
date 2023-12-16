@@ -4,7 +4,7 @@ import { EventLogger } from 'node-windows'
 
 export async function collectSystemInfo() {
   try {
-    const eventLog = new EventLogger('hola mundo')
+    const eventLog = new EventLogger()
 
     eventLog.warn('Watch out!')
     const systemReport = await si.get({
@@ -21,9 +21,9 @@ export async function collectSystemInfo() {
       battery: '*',
       audio: '*',
       networkInterfaces: '*',
-      currentLoad: '*',
-      processes: '*',
-      services: '*',
+      // currentLoad: '*',
+      // processes: '*',
+      // services: '*',
       virtualization: '*',
       bluetooth: '*',
       wifi: '*',
@@ -32,7 +32,6 @@ export async function collectSystemInfo() {
       time: '*',
       cpuTemperature: '*'
     })
-    console.log(eventLog)
     // Agregar información adicional
     systemReport.currentUser = os.userInfo().username
 

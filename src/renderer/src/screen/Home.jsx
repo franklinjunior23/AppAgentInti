@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import Header from '../components/Header'
 import { DataInformationPC } from '../store'
-import { IconDeviceDesktop } from '@tabler/icons-react'
+import { IconBrandWindows, IconDeviceDesktop, IconUser } from '@tabler/icons-react'
+import { AxiosRest } from '../helpers/ApiConfig'
+import { toast } from 'react-toastify'
 
 function Home() {
-  const { data, AddData } = DataInformationPC()
+  const { data, AddData, iDDispositivo } = DataInformationPC()
+
   useEffect(() => {
     async function getInfo() {
       window.systemAPI.getInfo().then((systemReport) => {
@@ -18,19 +21,48 @@ function Home() {
           AddData(...systemReport)
         })
       }, 300000)
+      /// cada 5 minutos
     }
     getInfo()
-  }, [])
+
+    setInterval(
+      () => {
+        sendSystemInfo(iDDispositivo, data)
+      },
+      5.0 * 60 * 1000
+    )
+
+    return () => clearInterval(getInfo())
+  }, [data])
   if (data.length === 0) return <h3 className="text-center mt-5">Cargando ....</h3>
   return (
     <>
       <Header />
+
       <main className="ml-[250px] p-4 text-white">
-        <h1 className="text-center">Informacion de la pc</h1>
+        <h1 className="text-center bg-black/50 py-4 rounded-lg text-xl font-semibold tracking-wide	">
+          Informacion de la pc
+        </h1>
         {data.length === 0 && <h3 className="text-center mt-5">Cargando ....</h3>}
-        <div className="w-full ">
-          <h3>Usuario Logeado : {data[0].currentUser ?? ''}</h3>
-        </div>
+        <header className="grid grid-cols-2 gap-6">
+          <div className="bg-black/60 mt-4 p-5 rounded-lg text-center">
+            <h3>
+              Usuario Logeado
+              <span className="flex justify-center font-semibold text-xl items-center">
+                {data[0].currentUser ?? ''} <IconUser size={40} />
+              </span>
+            </h3>
+          </div>
+          <div className="bg-black/60 mt-4 p-5 rounded-lg text-center">
+            <h3>
+              Sistema Operativo
+              <span className="text-xl flex justify-center font-semibold items-center">
+                {data[0].osInfo.platform ?? 'Hubo un error'}
+                <IconBrandWindows size={40} />
+              </span>
+            </h3>
+          </div>
+        </header>
         <section className="grid grid-cols-2 gap-2 text-sm mt-4">
           <div className="p-5 bg-slate-600/30 rounded-lg">
             <h3>Placa madre : {data[0].baseboard.model ?? 'Hubo un error'}</h3>
@@ -114,3 +146,17 @@ function Home() {
 }
 
 export default Home
+
+async function sendSystemInfo(iDDispositivo, data) {
+  if (!(iDDispositivo > 0)) {
+    console.log('no existe ningún usuario')
+    return
+  }
+  const { data: DataApi } = await AxiosRest.post('/Dispositivos/Agent', {
+    ...data[0],
+    IdDipositivo: iDDispositivo
+  })
+  toast.success(DataApi.message)
+
+  console.log('Sí está listo')
+}
