@@ -60,6 +60,7 @@ function Home() {
                 {data[0].osInfo.platform ?? 'Hubo un error'}
                 <IconBrandWindows size={40} />
               </span>
+              <span className="text-sm">{data[0].osInfo.distro ?? 'Hubo un error'}</span>
             </h3>
           </div>
         </header>
