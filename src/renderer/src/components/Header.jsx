@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { DataInformationPC } from '../store'
 import { IconLayoutDashboard } from '@tabler/icons-react'
-
+import ImageUser from '../images/ImageUserLog.avif'
 function Header() {
   // const { bar } = BarStorage()
   const { data, AddData } = DataInformationPC()
@@ -70,7 +70,7 @@ function Header() {
           <footer>
             <header className="flex justify-between">
               <div className="flex gap-3 items-end">
-                <img src="/ImageUserLog.avif" className="w-12 rounded-lg" alt="" />
+                <img src={ImageUser} className="w-12 rounded-lg" alt="" />
                 <div className="">
                   <h3 className="text-white font-semibold text-lg">Soporte Ti</h3>
                   <span className="items-end text-white text-xs">Soporte</span>

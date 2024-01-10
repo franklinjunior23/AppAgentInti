@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Header from '../components/Header'
+
 import { AxiosRest } from '../helpers/ApiConfig'
 import { DataInformationPC } from '../store'
 import { toast } from 'react-toastify'
@@ -63,8 +63,7 @@ function Setting() {
   }
   return (
     <>
-      <Header />
-      <main className="ml-[250px] p-4 text-white">
+      <main className=" text-white">
         <header className="grid-cols-[300px_190px] grid items-end">
           <div>
             <h3 className="font-semibold">Token de la Sucursal</h3>
