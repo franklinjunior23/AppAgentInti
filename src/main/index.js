@@ -51,14 +51,14 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
   mainWindow.on('closed', () => {
-    mainWindow = null // Establecer la referencia a null
+    mainWindow.hide() // Establecer la referencia a null
   })
 }
 
 // Configuración de autoinicio (AutoLaunch)
 const appLauncher = new AutoLaunch({
   name: 'agentinventoy',
-  isHidden: false // Mantener oculta la ventana principal
+  isHidden: true // Mantener oculta la ventana principal
 })
 
 // Configuración de autoactualización (electron-updater)
