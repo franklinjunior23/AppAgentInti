@@ -6,7 +6,9 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import Support from './screen/Support'
-import Layaout from './screen/layaout'
+import Layaout from './screen/Layaout'
+import Example from './screen/Example'
+
 // import Login from './screen/Login'
 
 const queryClient = new QueryClient()
@@ -17,11 +19,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         {/* <Route path="/SignIn" element={<Login />} /> */}layaout
         <Route element={<Layaout />}>
-          <Route path="/" index element={<Home />} />
+          <Route path="/" index element={<Example />} />
           <Route path="/Setting" element={<Setting />} />
           <Route path="/Help" element={<Info />} />
           <Route path="/Update" element={<Update />} />
           <Route path="/Support" element={<Support />} />
+          <Route path="/Report" element={<Example />} />
         </Route>
       </Routes>
     </Router>

@@ -1,12 +1,15 @@
 import si from 'systeminformation'
 import os from 'os'
-import { EventLogger } from 'node-windows'
+// import { EventLogger } from 'node-windows'  // Solo para Windows
 
 export async function collectSystemInfo() {
   try {
-    const eventLog = new EventLogger()
+    // Solo para Windows
+    // const log = new EventLogger('My Event Log')
+    // log.info('Basic information about the system:')
+    // log.info('OS:', os.platform(), os.release())
+    // log.info('User:', os.userInfo().username)
 
-    eventLog.warn('Watch out!')
     const systemReport = await si.get({
       system: '*',
       osInfo: '*',
@@ -32,6 +35,7 @@ export async function collectSystemInfo() {
       time: '*',
       cpuTemperature: '*'
     })
+
     // Agregar información adicional
     systemReport.currentUser = os.userInfo().username
 

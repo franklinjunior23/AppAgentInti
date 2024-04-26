@@ -1,8 +1,17 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { NameFunction } from '../main/types'
 
 // Custom APIs for renderer
-const api = {}
+const api = {
+  getOs: async () => {
+    return await ipcRenderer.invoke(NameFunction.SystemOs)
+  }
+}
+
+ipcRenderer.on('pong', (event, message) => {
+  console.log(message)
+})
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

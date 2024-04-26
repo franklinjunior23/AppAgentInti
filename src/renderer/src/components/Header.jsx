@@ -21,19 +21,18 @@ function Header() {
     { name: 'Configuracion', path: '/Setting', icon: <IconSettings /> },
     { name: 'Actualizacion', path: '/Update', icon: <IconDownload /> },
     { name: 'Ayuda', path: '/Help', icon: <IconInfoSquareRounded /> },
-    { name: 'Soporte', path: '/Support', icon: <IconLifebuoy /> }
+    { name: 'Soporte', path: '/Support', icon: <IconLifebuoy /> },
+    { name: 'Reporte', path: '/Report', icon: <IconLifebuoy /> }
   ]
 
   useEffect(() => {
     async function getInfo() {
       window.systemAPI.getInfo().then((systemReport) => {
-        console.log('Información del sistema:', systemReport)
         AddData(...systemReport)
       })
 
       setTimeout(() => {
         window.systemAPI.getInfo().then((systemReport) => {
-          console.log('Información del sistema:', systemReport)
           AddData(...systemReport)
         })
       }, 300000)
