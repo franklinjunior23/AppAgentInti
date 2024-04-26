@@ -5,6 +5,7 @@ function Example() {
   const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 
   useEffect(() => {
+    /**
     const fetchData = async () => {
       try {
         const data = await window.api.getOs()
@@ -14,8 +15,16 @@ function Example() {
         // Aquí podrías establecer un estado de error y mostrar un mensaje al usuario
       }
     }
+    fetchData()*/
 
-    fetchData()
+    window.api.getOs().then((data) => {
+      setdataPc(data)
+      console.log(data)
+    })
+
+    return () => {
+      window.api.getOs().then((data) => setdataPc(data))
+    }
   }, [])
 
   /**

@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-
 import { AxiosRest } from '../helpers/ApiConfig'
 import { DataInformationPC } from '../store'
 import { toast } from 'react-toastify'
+import { useDataSystem } from '../store/Use-data-system'
 
 function Setting() {
+  const { datainformation } = useDataSystem()
   const [DataToken, setDataToken] = useState(localStorage.getItem('TokenSucursal') ?? '')
   const { data, AddDispositivoId, iDDispositivo, CloseOpenAuth, TrueOpenAuth } = DataInformationPC()
   const Data_empresa = JSON.parse(localStorage.getItem('Data_Empresa'))
+
   useEffect(() => {
     const handleStorageChange = () => {
       setDataToken(localStorage.getItem('TokenSucursal') || '')
@@ -48,7 +50,7 @@ function Setting() {
 
   async function handleDatsBack() {
     const { data: DataApi } = await AxiosRest.post('/Dispositivos/Agent', {
-      ...data[0],
+      ...datainformation,
       IdDipositivo: localStorage.getItem('IdDispositivo')
     })
     return toast.info(DataApi.message)

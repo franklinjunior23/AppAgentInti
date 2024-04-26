@@ -6,13 +6,14 @@ import { collectSystemInfo } from './SystemInfo'
 import AutoLaunch from 'auto-launch'
 import { autoUpdater } from 'electron-updater'
 import { NameFunction } from './types'
+import cron from 'node-cron'
+import axios from 'axios'
 
-let mainWindow
 let tray = null
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     width: 900,
     height: 600,
     show: false,
@@ -38,6 +39,17 @@ function createWindow() {
       .catch((error) => {
         console.error('Error al recopilar información del sistema:', error)
       })
+    cron.schedule('*/5 * * * *', async () => {
+      try {
+        // Lógica para enviar información a la API
+        const response = await axios.post('https://tu-api.com/ruta', {
+          // Datos que deseas enviar a la API
+        })
+        console.log('Información enviada correctamente:', response.data)
+      } catch (error) {
+        console.error('Error al enviar información a la API:', error)
+      }
+    })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -52,17 +64,71 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Abrir Aplicacion',
+      type: 'normal',
+      click: () => {
+        mainWindow.show()
+      }
+    },
+    {
+      label: 'Ocultar Aplicacion',
+      type: 'normal',
+      click: () => {
+        mainWindow.hide()
+      }
+    },
+    {
+      label: 'Recargar Aplicacion',
+      type: 'normal',
+      click: () => {
+        mainWindow.reload()
+      }
+    },
+    {
+      label: 'AutoInicio',
+      type: 'checkbox',
+      checked: app.getLoginItemSettings().openAtLogin,
+      click: () => {
+        const settings = app.getLoginItemSettings()
+        app.setLoginItemSettings({
+          openAtLogin: !settings.openAtLogin,
+          path: app.getPath('exe')
+        })
+      }
+    },
+    {
+      label: 'Cerrar Aplicacion',
+      type: 'normal',
+      click: () => {
+        app.isQuitting = true // Marcar que la aplicación está cerrando
+        app.quit()
+      }
+    }
+  ])
+  tray.setToolTip('AgentInventory')
+  tray.setContextMenu(contextMenu)
+
+  mainWindow.on('close', (event) => {
+    if (!app.isQuitting) {
+      event.preventDefault()
+      mainWindow.hide()
+    }
+  })
 }
-
-ipcMain.handle(NameFunction.SystemOs, async () => {
-  const systemReport = await collectSystemInfo()
-  return systemReport
-})
-
 // Configuración de autoinicio (AutoLaunch)
 const appLauncher = new AutoLaunch({
   name: 'agentinventoy',
   isHidden: true // Mantener oculta la ventana principal
+})
+
+ipcMain.handle(NameFunction.SystemOs, async () => {
+  console.log('enviando')
+  const systemReport = await collectSystemInfo()
+  return systemReport
 })
 
 // Configuración de autoactualización (electron-updater)
@@ -71,36 +137,12 @@ autoUpdater.setFeedURL({
   owner: 'franklinjunior23',
   repo: 'AppAgentInti'
 })
-setInterval(() => {
-  console.log('Checking for updates...')
-}, 2000)
 
 app.whenReady().then(() => {
-  tray = new Tray(icon)
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Abrir Aplicacion',
-      type: 'normal',
-      click: () => {
-        console.log(mainWindow?.isVisible())
-      }
-    },
-    {
-      label: 'Ocultar Aplicacion',
-      type: 'normal',
-      click: () => {
-        mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
-      }
-    },
-    { label: 'Cerrar Aplicacion', type: 'normal', click: () => app.quit() }
-  ])
-  tray.setToolTip('AgentInventory')
-  tray.setContextMenu(contextMenu)
   /**
  *
  *   tray.on('click', () => {
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show()
+    mainWindow.isVisible() ??  mainWindow.show()
   })
  */
 
@@ -124,11 +166,10 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-
-  app.on('window-all-closed', () => {
+  app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
-      app.isQuiting = true
-      //  app.quit() //Cerrar la aplicacion
+      // app.isQuiting = true
+      app.quit() // Quit the app when all windows are closed, except on macOS.
     }
   })
 })
