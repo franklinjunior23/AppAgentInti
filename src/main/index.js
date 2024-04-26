@@ -40,13 +40,10 @@ function createWindow() {
       })
   })
 
-  /**
-  *  mainWindow.webContents.setWindowOpenHandler((details) => {
+  mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
-  }
-  *
-  */
+  })
 
   // HMR for renderer based on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -86,12 +83,7 @@ app.whenReady().then(() => {
       label: 'Abrir Aplicacion',
       type: 'normal',
       click: () => {
-        try {
-          app.isQuiting = false
-          
-        } catch (error) {
-          console.log(error)
-        }
+        console.log(mainWindow?.isVisible())
       }
     },
     {
@@ -132,11 +124,10 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-      console.log('Cerrando Aplicacion')
       app.isQuiting = true
-
       //  app.quit() //Cerrar la aplicacion
     }
   })
