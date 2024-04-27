@@ -9,7 +9,8 @@ import Support from './screen/Support'
 import Layaout from './screen/Layaout'
 import Example from './screen/Example'
 import { ProvideSystemData } from './store/Use-data-system'
-
+// Supports weights 100-900
+import '@fontsource-variable/inter';
 // import Login from './screen/Login'
 
 const queryClient = new QueryClient()

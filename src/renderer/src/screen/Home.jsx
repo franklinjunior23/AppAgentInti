@@ -1,5 +1,5 @@
 import { IconBrandWindows, IconDeviceDesktop, IconUser } from '@tabler/icons-react'
-import SectionLayaout from '../components/SectionLayaout'
+import SectionLayaout from '../componentes/SectionLayaout'
 import { useDataSystem } from '../store/Use-data-system'
 
 function Home() {

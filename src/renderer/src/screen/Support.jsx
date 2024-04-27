@@ -1,5 +1,5 @@
-import ComingItem from '../components/ComingItem'
-import Input from '../components/Input'
+import ComingItem from '../componentes/ComingItem'
+import Input from '../componentes/Input'
 import { toast } from 'react-toastify'
 function Support() {
   return (

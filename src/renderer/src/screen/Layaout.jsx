@@ -1,4 +1,4 @@
-import Header from '../components/Header'
+import Header from '../componentes/Header'
 import { Outlet } from 'react-router-dom'
 
 function Layaout() {
@@ -6,7 +6,7 @@ function Layaout() {
     <>
       <main className=" w-screen h-screen overflow-x-hidden flex">
         <Header />
-        <main className="ml-[250px] p-4 h-full ScroolLayaot overflow-y-auto">
+        <main className="p-2 h-full w-full ScroolLayaot overflow-y-auto">
           <Outlet />
         </main>
       </main>
