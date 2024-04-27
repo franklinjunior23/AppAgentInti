@@ -21,8 +21,8 @@ export const ProvideSystemData = ({ children }) => {
   useEffect(() => {
     // Función para obtener y establecer la información del sistema
     const fetchSystemInfo = () => {
-      console.log('fetchSystemInfo')
       window.api.getOs().then((data) => {
+        console.log(data)
         setdatainformation(data)
       })
     }
