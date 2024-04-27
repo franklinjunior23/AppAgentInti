@@ -8,13 +8,10 @@ import {
 } from '@tabler/icons-react'
 // import { BarStorage } from '../store/HeadBar'
 import { Link } from 'react-router-dom'
-import { useEffect } from 'react'
-import { DataInformationPC } from '../store'
 import { IconLayoutDashboard } from '@tabler/icons-react'
 import ImageUser from '../images/ImageUserLog.avif'
 function Header() {
   // const { bar } = BarStorage()
-  const { data, AddData } = DataInformationPC()
 
   const PathLinks = [
     { name: 'Dashboard', path: '/', icon: <IconLayoutDashboard /> },
@@ -24,36 +21,14 @@ function Header() {
     { name: 'Soporte', path: '/Support', icon: <IconLifebuoy /> },
     { name: 'Reporte', path: '/Report', icon: <IconLifebuoy /> }
   ]
-
-  useEffect(() => {
-    async function getInfo() {
-      window.systemAPI.getInfo().then((systemReport) => {
-        AddData(...systemReport)
-      })
-
-      setTimeout(() => {
-        window.systemAPI.getInfo().then((systemReport) => {
-          AddData(...systemReport)
-        })
-      }, 300000)
-    }
-    getInfo()
-  }, [])
-  if (data.length === 0) return <h3 className="text-center mt-5">Cargando ....</h3>
   return (
-    <aside className=" fixed h-screen left-0 top-0 w-[245px] py-4 pl-5">
-      <header className="bg-[#292929]/80 w-[100%] h-[100%] rounded-xl p-4 flex flex-col justify-between">
+    <aside className=" ">
+      <header className="bg-[#292929]/40 w-[100%] h-[100%] p-2 flex flex-col justify-between">
         <header className="flex gap-3 flex-col justify-between h-full">
           <section>
             <div className="flex justify-center items-center text-white text-xl gap-2 py-5">
-              <h1 className="text-center text-2xl font-bold">AgenteSoft </h1>{' '}
               <IconBrandTidal size={32} />
             </div>
-            {/* <img
-            src="https://cdn-icons-png.flaticon.com/512/8759/8759045.png"
-            className=" w-[100px] mx-auto"
-            alt=""
-          /> */}
             <main className="mt-4  grid gap-2">
               {PathLinks.map((Url, index) => (
                 <Link

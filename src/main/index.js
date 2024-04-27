@@ -14,11 +14,14 @@ let tray = null
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 600,
+    width: 950,
+    height: 580,
     show: false,
     resizable: false,
     autoHideMenuBar: true,
+    vibrancy: 'under-window',
+    titleBarStyle: 'hidden',
+    visualEffectState: 'active',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       nodeIntegration: true,
