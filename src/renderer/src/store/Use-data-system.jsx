@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const Contextdatadevice = createContext()
 
@@ -42,11 +42,8 @@ export const ProvideSystemData = ({ children }) => {
   useEffect(() => {
     function handleStorage() {
       const dataCompany = localStorage.getItem('Data_Empresa')
-      console.log(dataCompany)
       const tokenBranch = localStorage.getItem('TokenSucursal')
       const IdDevice = localStorage.getItem('IdDispositivo')
-      console.log('validadndo')
-
       setdataCompany(dataCompany)
       setTokenBranch(tokenBranch)
       setIdDevice(IdDevice)

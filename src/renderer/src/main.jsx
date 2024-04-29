@@ -9,9 +9,9 @@ import Support from './screen/Support'
 import Layaout from './screen/Layaout'
 import Example from './screen/Example'
 import { ProvideSystemData } from './store/Use-data-system'
-// Supports weights 100-900
-import '@fontsource-variable/inter';
-// import Login from './screen/Login'
+import '@fontsource-variable/inter'
+import PageAplications from './screen/Aplications'
+import History from './screen/History'
 
 const queryClient = new QueryClient()
 
@@ -22,8 +22,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Routes>
           <Route element={<Layaout />}>
             <Route path="/" index element={<Home />} />
+            <Route path="/aplications" element={<PageAplications />} />
             <Route path="/Setting" element={<Setting />} />
             <Route path="/Help" element={<Info />} />
+            <Route path="/history" element={<History />} />
             <Route path="/Update" element={<Update />} />
             <Route path="/Support" element={<Support />} />
             <Route path="/Report" element={<Example />} />

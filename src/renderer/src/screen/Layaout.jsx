@@ -6,7 +6,7 @@ function Layaout() {
     <>
       <main className=" w-screen h-screen overflow-x-hidden flex">
         <Header />
-        <main className="p-2 h-full w-full ScroolLayaot overflow-y-auto bg-white">
+        <main className="p-2 h-full w-full ScroolLayaot overflow-y-auto bg-white ">
           <Outlet />
         </main>
       </main>

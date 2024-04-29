@@ -1,16 +1,5 @@
-import {
-  IconBrandTidal,
-  IconDownload,
-  IconInfoSquareRounded,
-  IconLifebuoy,
-  IconLogout,
-  IconSettings,
-  IconSmartHome,
-  IconUsers
-} from '@tabler/icons-react'
+import { IconBrandTidal, IconSettings, IconUsers } from '@tabler/icons-react'
 import { Link, NavLink } from 'react-router-dom'
-import { IconLayoutDashboard } from '@tabler/icons-react'
-import ImageUser from '../images/ImageUserLog.avif'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,22 +9,10 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-function Header() {
-  // const { bar } = BarStorage()
+import { DataNavbar } from '@/data/Navbar.data'
 
-  const PathLinks = [
-    { name: 'Dashboard', path: '/', icon: <IconSmartHome size={24} strokeWidth={1.5} /> },
-    {
-      name: 'Aplicaciones',
-      path: '/aplications',
-      icon: <IconLayoutDashboard size={24} strokeWidth={1.5} />
-    },
-    { name: 'Configuracion', path: '/Setting', icon: <IconSettings size={24} strokeWidth={1.5} /> },
-    { name: 'Actualizacion', path: '/Update', icon: <IconDownload size={24} strokeWidth={1.5} /> },
-    { name: 'Ayuda', path: '/Help', icon: <IconInfoSquareRounded size={24} strokeWidth={1.5} /> },
-    { name: 'Soporte', path: '/Support', icon: <IconLifebuoy size={24} strokeWidth={1.5} /> },
-    { name: 'Reporte', path: '/Report', icon: <IconLifebuoy size={24} strokeWidth={1.5} /> }
-  ]
+function Header() {
+
   return (
     <aside className="w-[250px] bg-white/60 ">
       <header className=" h-screen  flex flex-col justify-between">
@@ -46,7 +23,7 @@ function Header() {
               <h3 className="font-semibold text-xl">Intiscorp</h3>
             </div>
             <main className="mt-4  grid">
-              {PathLinks.map((Url, index) => (
+              {DataNavbar.map((Url, index) => (
                 <NavLink
                   to={Url.path}
                   className={({ isActive }) => {

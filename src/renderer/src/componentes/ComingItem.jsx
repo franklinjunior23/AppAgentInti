@@ -1,10 +1,13 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { RocketIcon } from '@radix-ui/react-icons'
 
 function ComingItem() {
   return (
-    <section className="fixed bottom-5 right-3 p-4 bg-white rounded-lg w-[300px] h-[130px] text-black">
-      <h3 className=" font-extrabold mb-3 text-xl">Proximamente ...</h3>
-      <span className="text-sm">Proximamente se estara habilitando esta seccion ...</span>
-    </section>
+    <Alert className="mt-5">
+      <RocketIcon className="h-4 w-4" />
+      <AlertTitle>Proximamente!</AlertTitle>
+      <AlertDescription>Proximamente se estara habilitando ello..... </AlertDescription>
+    </Alert>
   )
 }
 

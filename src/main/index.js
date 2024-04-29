@@ -8,8 +8,13 @@ import { autoUpdater } from 'electron-updater'
 import { NameFunction } from './types'
 import cron from 'node-cron'
 import axios from 'axios'
+import fs from 'fs'
 
 let tray = null
+
+// configs
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
 
 function createWindow() {
   // Create the browser window.
@@ -20,7 +25,6 @@ function createWindow() {
     resizable: false,
     autoHideMenuBar: true,
     vibrancy: 'under-window',
-    titleBarStyle: 'hidden',
     visualEffectState: 'active',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -42,13 +46,20 @@ function createWindow() {
       .catch((error) => {
         console.error('Error al recopilar información del sistema:', error)
       })
-    cron.schedule('*/5 * * * *', async () => {
+
+    // */10 * * * *
+    // 10 minutos de retraso para enviar la data
+    cron.schedule('*/5 * * * * *', async () => {
+      const idDevice = readUserData()?.iddevice
+      const systemReport = await collectSystemInfo()
+      if (!idDevice) return
       try {
         // Lógica para enviar información a la API
-        const response = await axios.post('https://tu-api.com/ruta', {
-          // Datos que deseas enviar a la API
+        const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
+          IdDipositivo: idDevice,
+          ...systemReport
         })
-        console.log('Información enviada correctamente:', response.data)
+        console.log('Información enviada correctamente:', response)
       } catch (error) {
         console.error('Error al enviar información a la API:', error)
       }
@@ -129,7 +140,6 @@ const appLauncher = new AutoLaunch({
 })
 
 ipcMain.handle(NameFunction.SystemOs, async () => {
-  console.log('enviando')
   const systemReport = await collectSystemInfo()
   return systemReport
 })
@@ -138,17 +148,14 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 autoUpdater.setFeedURL({
   provider: 'github',
   owner: 'franklinjunior23',
-  repo: 'AppAgentInti'
+  repo: 'AppAgentInti',
+  releaseType: 'release',
+  host: 'github.com',
+  private: true,
+  token: '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'
 })
 
 app.whenReady().then(() => {
-  /**
- *
- *   tray.on('click', () => {
-    mainWindow.isVisible() ??  mainWindow.show()
-  })
- */
-
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -158,6 +165,8 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
+
+  ipcMain.on('device-data', StorageDevice)
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
@@ -169,6 +178,9 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  autoUpdater.checkForUpdates()
+
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
       // app.isQuiting = true
@@ -176,3 +188,36 @@ app.whenReady().then(() => {
     }
   })
 })
+
+process.on('uncaughtException', function (error) {
+  console.error('uncaughtException', error)
+})
+
+export function StorageDevice(event, data) {
+  const userDataPath = app.getPath('userData')
+  const filePath = `${userDataPath}/user-data.json`
+
+  try {
+    // Convertir los datos del usuario a formato JSON y guardarlos en el archivo
+    fs.writeFileSync(filePath, JSON.stringify({ iddevice: data }))
+    console.log('Datos del usuario guardados correctamente.')
+  } catch (error) {
+    console.error('Error al guardar los datos del usuario:', error)
+  }
+}
+function readUserData() {
+  const userDataPath = app.getPath('userData')
+  const filePath = `${userDataPath}/user-data.json`
+
+  try {
+    // Leer el contenido del archivo
+    const data = fs.readFileSync(filePath, 'utf-8')
+    // Parsear el contenido como un objeto JSON
+    const userData = JSON.parse(data)
+    console.log('Datos del usuario leídos correctamente:', userData)
+    return userData
+  } catch (error) {
+    console.log(error.message, 'Error al leer los datos del usuario.')
+    return null
+  }
+}
