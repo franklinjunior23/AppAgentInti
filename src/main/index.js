@@ -11,6 +11,7 @@ import axios from 'axios'
 import fs from 'fs'
 
 let tray = null
+let data_device = null
 
 // configs
 autoUpdater.autoDownload = false
@@ -49,15 +50,14 @@ function createWindow() {
 
     // */10 * * * *
     // 10 minutos de retraso para enviar la data
-    cron.schedule('*/5 * * * * *', async () => {
+    cron.schedule('*/10 * * * *', async () => {
       const idDevice = readUserData()?.iddevice
-      const systemReport = await collectSystemInfo()
       if (!idDevice) return
       try {
         // Lógica para enviar información a la API
         const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
           IdDipositivo: idDevice,
-          ...systemReport
+          ...data_device
         })
         console.log('Información enviada correctamente:', response)
       } catch (error) {
@@ -141,6 +141,7 @@ const appLauncher = new AutoLaunch({
 
 ipcMain.handle(NameFunction.SystemOs, async () => {
   const systemReport = await collectSystemInfo()
+  data_device = systemReport
   return systemReport
 })
 

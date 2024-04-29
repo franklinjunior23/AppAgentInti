@@ -12,12 +12,12 @@ asarUnpack:
   - resources/**
 win:
   executableName: agentinventoy
-  perMachine: true
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  perMachine: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
