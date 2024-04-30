@@ -60,9 +60,7 @@ function createWindow() {
           IdDipositivo: idDevice,
           data_device
         })
-        console.log('Información enviada correctamente:', response.data)
       } catch (error) {
-        console.error('Error al enviar información a la API:', error)
       }
     })
   })
