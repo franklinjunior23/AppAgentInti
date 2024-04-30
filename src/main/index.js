@@ -51,7 +51,7 @@ function createWindow() {
 
     // */10 * * * *
     // 10 minutos de retraso para enviar la data
-    cron.schedule('*/1 * * * *', async () => {
+    cron.schedule('*/10 * * * *', async () => {
       const idDevice = readUserData()?.iddevice
       if (!idDevice) return
       try {
