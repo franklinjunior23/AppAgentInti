@@ -9,6 +9,7 @@ import { NameFunction } from './types'
 import cron from 'node-cron'
 import axios from 'axios'
 import fs from 'fs'
+import path from 'path'
 
 let tray = null
 let data_device = null
@@ -50,16 +51,16 @@ function createWindow() {
 
     // */10 * * * *
     // 10 minutos de retraso para enviar la data
-    cron.schedule('*/10 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
       const idDevice = readUserData()?.iddevice
       if (!idDevice) return
       try {
         // Lógica para enviar información a la API
         const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
           IdDipositivo: idDevice,
-          ...data_device
+          data_device
         })
-        console.log('Información enviada correctamente:', response)
+        console.log('Información enviada correctamente:', response.data)
       } catch (error) {
         console.error('Error al enviar información a la API:', error)
       }
@@ -195,8 +196,10 @@ process.on('uncaughtException', function (error) {
 })
 
 export function StorageDevice(event, data) {
-  const userDataPath = app.getPath('userData')
-  const filePath = `${userDataPath}/user-data.json`
+  const appDirectory = path.dirname(app.getPath('exe'))
+
+  // Ruta completa para guardar el archivo en el directorio de la aplicación
+  const filePath = path.join(appDirectory, 'user-data.json')
 
   try {
     // Convertir los datos del usuario a formato JSON y guardarlos en el archivo
@@ -207,18 +210,18 @@ export function StorageDevice(event, data) {
   }
 }
 function readUserData() {
-  const userDataPath = app.getPath('userData')
-  const filePath = `${userDataPath}/user-data.json`
+  const appDirectory = path.dirname(app.getPath('exe'))
+
+  // Ruta completa del archivo en el directorio de la aplicación
+  const filePath = path.join(appDirectory, 'user-data.json')
 
   try {
     // Leer el contenido del archivo
     const data = fs.readFileSync(filePath, 'utf-8')
-    // Parsear el contenido como un objeto JSON
-    const userData = JSON.parse(data)
-    console.log('Datos del usuario leídos correctamente:', userData)
-    return userData
+    console.log('Contenido del archivo:', data)
+    return JSON.parse(data) // Si el archivo contiene datos JSON
   } catch (error) {
-    console.log(error.message, 'Error al leer los datos del usuario.')
+    console.error('Error al leer el archivo desde la raíz del sistema:', error)
     return null
   }
 }

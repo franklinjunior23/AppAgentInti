@@ -110,6 +110,7 @@ export async function collectSystemInfo() {
     alldata.currentUser = os.userInfo().username
     alldata.processes = null
     alldata.aplications = aplications
+    alldata.networkInterfaces = os.networkInterfaces()
 
     return alldata
   } catch (error) {
