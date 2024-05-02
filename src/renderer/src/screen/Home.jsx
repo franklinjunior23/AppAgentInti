@@ -7,6 +7,10 @@ import Monitory from '@/componentes/items/Monitory'
 import Bios from '@/componentes/items/Bios'
 import Storage from '@/componentes/items/Storage'
 import Processor from '@/componentes/items/Processor'
+import Network from '@/componentes/items/Network'
+import Motherboard from '@/componentes/items/Motherboard'
+import SectionLayaout from '@/componentes/items/SectionLayaout'
+import { Separator } from '@/components/ui/separator'
 
 function Home() {
   const { datainformation } = useDataSystem()
@@ -14,18 +18,26 @@ function Home() {
   return (
     <>
       <main className=" text-white ">
-        <header className="grid grid-cols-2 gap-6 ">
-          <UserAuth />
-          <SystemOperative />
-        </header>
+        <main className="px-4">
+          <SectionLayaout
+            className={
+              'dark:bg-gradient-to-r from-indigo-500/40  from-10% via-sky-500/40 via-30% to-emerald-500/40 to-90%0 flex justify-between items-center '
+            }
+          >
+            <SystemOperative />
+            <Separator className="h-[200px]  bg-white/20 w-0.5 " />
+            <UserAuth />
+          </SectionLayaout>
+        </main>
         <section className="grid grid-cols-2 gap-2 text-sm mt-4">
-          <Os />
+          <Motherboard />
           <Processor />
           <Monitory />
           <MemoryRam />
           <Bios />
         </section>
         <Storage />
+        <Network />
       </main>
     </>
   )

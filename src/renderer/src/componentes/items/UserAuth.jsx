@@ -5,15 +5,14 @@ import { IconUser } from '@tabler/icons-react'
 function UserAuth() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout>
-      <h3>
-        Usuario Logeado
-        <span className="flex justify-center gap-2 font-semibold text-xl items-center">
-          {datainformation.currentUser ?? ''} <IconUser size={40} />
-        </span>
-        <span className="text-sm">{datainformation.os.hostname ?? 'Hubo un error'}</span>
-      </h3>
-    </SectionLayaout>
+    <div>
+      <h3 className="text-center">Usuario Logeado </h3>
+      <span className="flex  gap-2 font-semibold text-xl items-center justify-center bg-white/20 p-1 rounded-lg my-1">
+        {datainformation.currentUser ?? ''}{' '}
+        <IconUser size={30} className="bg-white rounded-full text-black p-1 " />
+      </span>
+      <h4 className="text-sm text-center">{datainformation.osInfo.hostname ?? 'Hubo un error'}</h4>
+    </div>
   )
 }
 

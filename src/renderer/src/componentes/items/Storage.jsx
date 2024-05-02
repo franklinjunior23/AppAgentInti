@@ -5,7 +5,7 @@ import { useDataSystem } from '@/store/Use-data-system'
 function Storage() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="p-5 bg-slate-600/30 rounded-lg mt-5">
+    <SectionLayaout className="">
       <h1 className="text-center text-2xl">Discos Duros</h1>
       <h3>Discos Duros cantidad : {datainformation.diskLayout.length}</h3>
       <ul className="w-full grid grid-cols-3 gap-5">

@@ -74,8 +74,8 @@ function Setting() {
 
   return (
     <>
-      <main className="">
-        <header className="grid-cols-[300px_190px] grid items-end">
+      <main className="mx-4">
+        <header className="grid-cols-[300px_190px]  grid items-end">
           <div>
             <h3 className="font-semibold">Token de la Sucursal</h3>
             <Input
@@ -99,6 +99,7 @@ function Setting() {
           {localStorage.getItem('TokenSucursal') && (
             <Button
               disabled
+              variant="second"
               onClick={HandleDeleteToken}
               className="bg-black py-3 text-sm px-4 ml-5 rounded-md font-semibold"
             >
@@ -136,8 +137,9 @@ function Setting() {
         )} */}
 
         <Button
+          variant="secondary"
           onClick={handleDatsBack}
-          className="bg-black font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+          className=" font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
         >
           Enviar data
         </Button>

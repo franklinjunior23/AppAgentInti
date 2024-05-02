@@ -14,6 +14,21 @@ import path from 'path'
 let tray = null
 let data_device = null
 
+async function RequestData() {
+  const idDevice = readUserData()?.iddevice
+  if (!idDevice) return
+  try {
+    // Lógica para enviar información a la API
+    const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
+      IdDipositivo: idDevice,
+      data_device
+    })
+    console.log('Información enviada correctamente:', response.data)
+  } catch (error) {
+    console.error('Error al enviar información a la API:', error)
+  }
+}
+
 // configs
 autoUpdater.autoDownload = false
 autoUpdater.autoInstallOnAppQuit = true
@@ -51,18 +66,18 @@ function createWindow() {
 
     // */10 * * * *
     // 10 minutos de retraso para enviar la data
-    cron.schedule('*/10 * * * *', async () => {
-      const idDevice = readUserData()?.iddevice
-      if (!idDevice) return
-      try {
-        // Lógica para enviar información a la API
-        const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
-          IdDipositivo: idDevice,
-          data_device
-        })
-      } catch (error) {
-      }
-    })
+    // cron.schedule('*/10 * * * *', async () => {
+    //   const idDevice = readUserData()?.iddevice
+    //   if (!idDevice) return
+    //   try {
+    //     // Lógica para enviar información a la API
+    //     const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
+    //       IdDipositivo: idDevice,
+    //       data_device
+    //     })
+    //   } catch (error) {
+    //   }
+    // })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -193,6 +208,7 @@ process.on('uncaughtException', function (error) {
   console.error('uncaughtException', error)
 })
 
+
 export function StorageDevice(event, data) {
   const appDirectory = path.dirname(app.getPath('exe'))
 
@@ -207,6 +223,7 @@ export function StorageDevice(event, data) {
     console.error('Error al guardar los datos del usuario:', error)
   }
 }
+
 function readUserData() {
   const appDirectory = path.dirname(app.getPath('exe'))
 

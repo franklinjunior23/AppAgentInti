@@ -4,7 +4,7 @@ import { useDataSystem } from '@/store/Use-data-system'
 function MemoryRam() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="p-5 bg-slate-600/30 rounded-lg">
+    <SectionLayaout className="">
       <h3>Cantidad de Memoria Ram : {datainformation.memLayout.length ?? ''}</h3>
       <ul>
         {datainformation.memLayout.map((Ram, index) => (

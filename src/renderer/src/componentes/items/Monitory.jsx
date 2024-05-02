@@ -6,7 +6,7 @@ import { IconDeviceDesktop } from '@tabler/icons-react'
 function Monitory() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="p-5 bg-slate-600/30 rounded-lg">
+    <SectionLayaout className="rounded-lg">
       <h3>Monitores Conectados : {datainformation.graphics.displays.length ?? 'Hubo un error'}</h3>
       <ul className="">
         {datainformation.graphics.displays.map((monitor, index) => (

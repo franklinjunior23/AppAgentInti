@@ -1,23 +1,40 @@
-import SectionLayaout from './SectionLayaout'
-import { IconBrandWindows } from '@tabler/icons-react'
 import { useDataSystem } from '@/store/Use-data-system'
+import { TypesOs } from '@/helpers/TypesOs'
+import { LabelItem } from './SectionLayaout'
 
 function SystemOperative() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout>
-      <>
-        Sistema Operativo
-        <span className="text-xl flex justify-center font-semibold items-center">
-          {datainformation.os.platform ?? 'Hubo un error'}
-          <IconBrandWindows size={40} />
-        </span>
-        <h3 className="text-sm">{datainformation.os.distro ?? 'Hubo un error'}</h3>
-        <h3>Arquitectura : {datainformation.os.arch}</h3>
-        <h3>Version : {datainformation.os.release}</h3>
-        <h3>Kernel : {datainformation.os.kernel}</h3>
-      </>
-    </SectionLayaout>
+    <>
+      <div className="w-[55%] ">
+        <TypesOs platform={datainformation.osInfo.platform} />
+        <h3 className="text-xl capitalize ">
+          {datainformation.osInfo.platform ?? 'Hubo un error'}
+        </h3>
+        <main className="mt-4  ">
+          <LabelItem
+            label={'Distro'}
+            dataLabel={datainformation.osInfo.distro ?? 'Hubo un error distro'}
+          />
+          <LabelItem
+            label={'Arquitectura'}
+            dataLabel={datainformation.osInfo.arch ?? 'Hubo un error arch'}
+          />
+          <LabelItem
+            label={'Version'}
+            dataLabel={datainformation.osInfo.release ?? 'Hubo un error release'}
+          />
+          <LabelItem
+            label={'Kernel'}
+            dataLabel={datainformation.osInfo.kernel ?? 'Hubo un error kernel'}
+          />
+          <LabelItem
+            label={'Serial'}
+            dataLabel={datainformation.osInfo.serial ?? 'Hubo un error serial'}
+          />
+        </main>
+      </div>
+    </>
   )
 }
 
