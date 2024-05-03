@@ -21,7 +21,7 @@ function Home() {
         <main className="px-4">
           <SectionLayaout
             className={
-              'dark:bg-gradient-to-r from-indigo-500/40  from-10% via-sky-500/40 via-30% to-emerald-500/40 to-90%0 flex justify-between items-center '
+              'bg-gradient-to-r dark:from-indigo-500/50  from-indigo-500 from-10% dark:via-sky-500/40 via-sky-500  via-30% dark:to-emerald-500/50 to-emerald-500 to-90%0 flex justify-between items-center '
             }
           >
             <SystemOperative />
@@ -29,15 +29,26 @@ function Home() {
             <UserAuth />
           </SectionLayaout>
         </main>
-        <section className="grid grid-cols-2 gap-2 text-sm mt-4">
-          <Motherboard />
-          <Processor />
-          <Monitory />
-          <MemoryRam />
-          <Bios />
-        </section>
-        <Storage />
-        <Network />
+
+        <main className="px-4 ">
+          <div className="grid grid-cols-2 my-4 gap-5">
+            <Motherboard />
+            <Processor />
+          </div>
+          <main className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
+              <Monitory />
+              <Bios />
+            </div>
+            <div className="flex flex-col gap-4">
+              <MemoryRam />
+            </div>
+          </main>
+          <main className="flex flex-col gap-4 pb-4 mt-4">
+            <Storage />
+            <Network />
+          </main>
+        </main>
       </main>
     </>
   )

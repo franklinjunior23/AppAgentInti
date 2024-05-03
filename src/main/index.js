@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcRenderer, ipcMain, Tray, Menu } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Tray, Menu, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,7 +6,6 @@ import { collectSystemInfo } from './SystemInfo'
 import AutoLaunch from 'auto-launch'
 import { autoUpdater } from 'electron-updater'
 import { NameFunction } from './types'
-import cron from 'node-cron'
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
@@ -29,14 +28,25 @@ async function RequestData() {
   }
 }
 
-// configs
-autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = true
+// Configuración de autoactualización (electron-updater)
+autoUpdater.setFeedURL({
+  provider: 'github',
+  owner: 'franklinjunior23',
+  repo: 'AppAgentInti',
+  releaseType: 'release',
+  host: 'github.com',
+  private: true,
+  token: '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'
+})
+
+// // configs
+// autoUpdater.autoDownload = false
+// autoUpdater.autoInstallOnAppQuit = true
 
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 950,
+    width: 960,
     height: 580,
     show: false,
     resizable: false,
@@ -55,7 +65,47 @@ function createWindow() {
     mainWindow.show()
   })
 
+  function ShowMessage(message) {
+    mainWindow.webContents.send('message', message)
+  }
+
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    console.log('Actualización descargada')
+    const dialogOpts = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail: 'Una nueva versión ha sido descargada. Restart the application to apply the updates.'
+    }
+    console.log('lego')
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall()
+    })
+  })
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+    return { action: 'deny' }
+  })
+
+  autoUpdater.on('error', (error) => {
+    console.log('Error', error.message)
+  })
+
   mainWindow.webContents.on('did-finish-load', () => {
+    autoUpdater.checkForUpdates()
+    autoUpdater.on('update-not-available', () => {
+      ShowMessage('No hay actualizaciones disponibles.')
+    })
+    autoUpdater.on('checking-for-update', () => {
+      ShowMessage('Buscando actualizaciones...')
+    })
+    autoUpdater.on('update-available', () => {
+      ShowMessage('Actualización disponible...')
+    })
+
     collectSystemInfo()
       .then((data) => {
         mainWindow.webContents.send('SystemInfo', [data])
@@ -78,11 +128,6 @@ function createWindow() {
     //   } catch (error) {
     //   }
     // })
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
   })
 
   // HMR for renderer based on electron-vite cli.
@@ -159,19 +204,9 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
   return systemReport
 })
 
-// Configuración de autoactualización (electron-updater)
-autoUpdater.setFeedURL({
-  provider: 'github',
-  owner: 'franklinjunior23',
-  repo: 'AppAgentInti',
-  releaseType: 'release',
-  host: 'github.com',
-  private: true,
-  token: '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'
-})
-
 app.whenReady().then(() => {
   // Set app user model id for windows
+
   electronApp.setAppUserModelId('com.electron')
 
   // Default open or close DevTools by F12 in development
@@ -207,7 +242,6 @@ app.whenReady().then(() => {
 process.on('uncaughtException', function (error) {
   console.error('uncaughtException', error)
 })
-
 
 export function StorageDevice(event, data) {
   const appDirectory = path.dirname(app.getPath('exe'))

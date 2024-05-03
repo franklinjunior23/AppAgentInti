@@ -1,29 +1,35 @@
 import React from 'react'
-import SectionLayaout from './SectionLayaout'
+import SectionLayaout, { LabelItem } from './SectionLayaout'
 import { useDataSystem } from '@/store/Use-data-system'
 import { IconDeviceDesktop } from '@tabler/icons-react'
+import { Card } from '@/components/ui/card'
 
 function Monitory() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="rounded-lg">
+    <Card className="p-4">
+      <h2 className="text-2xl font-semibold mb-2">Monitores</h2>
       <h3>Monitores Conectados : {datainformation.graphics.displays.length ?? 'Hubo un error'}</h3>
       <ul className="">
         {datainformation.graphics.displays.map((monitor, index) => (
-          <li key={index} className="  bg-neutral-600 rounded-xl p-4 my-2 flex">
-            <div>
-              <h3>Conexion : {monitor.connection ?? ''}</h3>
-              <h3>hz de pantalla : {monitor.currentRefreshRate ?? ''} hz</h3>
-              <h3>
-                Resolucion de pantalla : {monitor.resolutionX} x {monitor.resolutionY}
-              </h3>
-              <h3>Nombre : {monitor.deviceName ?? ''}</h3>
+          <li
+            key={index}
+            className="  bg-neutral-600/30 rounded-xl p-4 my-2 flex justify-between items-center"
+          >
+            <div className="w-[75%]">
+              <LabelItem label={'Nombre'} dataLabel={monitor.deviceName} />
+              <LabelItem label={'Conexion'} dataLabel={monitor.connection} />
+              <LabelItem label={'Hz'} dataLabel={monitor.currentRefreshRate} />
+              <LabelItem
+                label={'Resolucion'}
+                dataLabel={`${monitor.resolutionX} x ${monitor.resolutionY}`}
+              />
             </div>
             <IconDeviceDesktop size={40} />
           </li>
         ))}
       </ul>
-    </SectionLayaout>
+    </Card>
   )
 }
 

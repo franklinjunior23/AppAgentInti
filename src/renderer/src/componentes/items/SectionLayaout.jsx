@@ -8,9 +8,9 @@ export default SectionLayaout
 
 export function LabelItem({ label, dataLabel }) {
   return (
-    <div className="flex justify-between items-center text-sm">
-      <h3 className="font-semibold">{label} :</h3>
-      <span>{dataLabel ?? '!Error'}</span>
+    <div className="flex justify-between items-center text-sm gap-2">
+      <h3 className="font-semibold ">{label} :</h3>
+      <span className="break-all text-end">{dataLabel ?? `!Error ${label}`}</span>
     </div>
   )
 }

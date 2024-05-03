@@ -1,41 +1,35 @@
 import { useDataSystem } from '@/store/Use-data-system'
-import SectionLayaout from './SectionLayaout'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { LabelItem } from './SectionLayaout'
+import { IconWorld } from '@tabler/icons-react'
 
 function Network() {
   const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="grid grid-cols-2 gap-5">
-      {datainformation.networkInterfaces.map((networkInterface) => (
-        <div key={networkInterface.mac} className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold">{networkInterface.iface}</h2>
-          <div>
-            <span className="font-semibold">IP4:</span> {networkInterface.ip4}
+    <Card className="">
+      <CardHeader>
+        <h2 className="text-2xl font-semibold ">Red</h2>
+      </CardHeader>
+      <CardContent className="grid grid-cols-3 gap-4">
+        {datainformation.networkInterfaces.map((networkInterface) => (
+          <div key={networkInterface.mac} className="my-2  bg-neutral-600/40 rounded-xl p-4">
+            <LabelItem label={'Nombre'} dataLabel={networkInterface.iface} />
+            <LabelItem label={'IP4'} dataLabel={networkInterface.ip4} />
+            <LabelItem label={'IP6'} dataLabel={networkInterface.ip6} />
+            <LabelItem label={'MAC'} dataLabel={networkInterface.mac} />
+            <LabelItem label={'Tipo'} dataLabel={networkInterface.type} />
+            <LabelItem label={'Velocidad'} dataLabel={networkInterface.speed} />
+            <LabelItem label={'Estado'} dataLabel={networkInterface.operstate} />
+            <LabelItem
+              label={'DHCP'}
+              dataLabel={networkInterface.dhcp ? 'Activado' : 'Desactivado'}
+            />
+            <LabelItem label={'Virtual'} dataLabel={networkInterface.virtual ? 'Si' : 'No'} />
+            <IconWorld size={40} />
           </div>
-          <div>
-            <span className="font-semibold">IP6:</span> {networkInterface.ip6}
-          </div>
-          <div>
-            <span className="font-semibold">MAC:</span> {networkInterface.mac}
-          </div>
-          <div>
-            <span className="font-semibold">Tipo:</span> {networkInterface.type}
-          </div>
-          <div>
-            <span className="font-semibold">Velocidad:</span> {networkInterface.speed}
-          </div>
-          <div>
-            <span className="font-semibold">Estado:</span> {networkInterface.operstate}
-          </div>
-          <div>
-            <span className="font-semibold">Dhcp estado :</span>
-            {networkInterface.dhcp ? 'Activado' : 'Desactivado'}
-          </div>
-          <div>
-            <span className="font-semibold">virtual:</span> {networkInterface.virtual ? 'Si' : 'No'}
-          </div>
-        </div>
-      ))}
-    </SectionLayaout>
+        ))}
+      </CardContent>
+    </Card>
   )
 }
 

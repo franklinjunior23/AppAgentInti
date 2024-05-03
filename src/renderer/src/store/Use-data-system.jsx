@@ -19,6 +19,17 @@ export const ProvideSystemData = ({ children }) => {
   })
 
   useEffect(() => {
+    window.electron.ipcRenderer.on('message', (event, message) => {
+      console.log('Mensaje recibido en el componente de React:', message)
+      // Aquí puedes hacer cualquier otra cosa con el mensaje recibido
+    })
+
+    return () => {
+      window.electron.ipcRenderer.removeAllListeners('message') // Limpiar el listener cuando el componente se desmonte
+    }
+  }, []) // Asegurarse de que este efecto se ejecute solo una vez
+
+  useEffect(() => {
     // Función para obtener y establecer la información del sistema
     const fetchSystemInfo = () => {
       window.api.getOs().then((data) => {

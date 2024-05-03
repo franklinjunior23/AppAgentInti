@@ -42,7 +42,7 @@ function Header() {
               <div className="flex justify-center gap-3 items-center py-3">
                 <div className="">
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger className="p-2">

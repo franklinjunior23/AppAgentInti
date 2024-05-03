@@ -1,17 +1,22 @@
 import React from 'react'
-import SectionLayaout from './SectionLayaout'
+import SectionLayaout, { LabelItem } from './SectionLayaout'
 import { useDataSystem } from '@/store/Use-data-system'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 function Motherboard() {
-    const { datainformation } = useDataSystem()
+  const { datainformation } = useDataSystem()
   return (
-    <SectionLayaout className="">
-      <h2 className="text-2xl font-semibold mb-2">Placa Madre</h2>
-      <h3>Placa madre : {datainformation.baseboard.model ?? 'Hubo un error'}</h3>
-      <h3>Placa manofactura : {datainformation.baseboard.manufacturer ?? 'Hubo un error'}</h3>
-      <h3>Serial : {datainformation.baseboard.serial ?? 'Hubo un error'}</h3>
-      <h3>Slots de memoria : {datainformation.baseboard.memSlots ?? 'Hubo un error'}</h3>
-    </SectionLayaout>
+    <Card className=" ">
+      <CardHeader>
+        <h2 className="text-2xl font-semibold mb-2">Placa Madre</h2>
+      </CardHeader>
+      <CardContent>
+        <LabelItem label={'Modelo'} dataLabel={datainformation.baseboard.model} />
+        <LabelItem label={'Man.'} dataLabel={datainformation.baseboard.manufacturer} />
+        <LabelItem label={'Serial'} dataLabel={datainformation.baseboard.serial} />
+        <LabelItem label={'Slots de Ram'} dataLabel={datainformation.baseboard.memSlots} />
+      </CardContent>
+    </Card>
   )
 }
 

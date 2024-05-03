@@ -1,6 +1,6 @@
 export function TypesOs({ platform, className }) {
   switch (platform) {
-    case 'windows' || 'win32' || 'win64' || 'win' || 'Windows':
+    case 'windows' || 'win32' || 'win64' || 'win' || 'Windows' || 'Window':
       return <Windows className={className} />
     case 'linux' || 'Linux':
       return <Linux className={className} />

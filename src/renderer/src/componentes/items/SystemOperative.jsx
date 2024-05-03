@@ -6,9 +6,9 @@ function SystemOperative() {
   const { datainformation } = useDataSystem()
   return (
     <>
-      <div className="w-[55%] ">
+      <div className="w-[57%] ">
         <TypesOs platform={datainformation.osInfo.platform} />
-        <h3 className="text-xl capitalize ">
+        <h3 className="text-xl capitalize font-bold ">
           {datainformation.osInfo.platform ?? 'Hubo un error'}
         </h3>
         <main className="mt-4  ">

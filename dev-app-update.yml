@@ -1,3 +1,9 @@
-provider: generic
+provider: github
 url: https://github.com/franklinjunior23/AppAgentInti
 updaterCacheDirName: agentinventoy-updater
+owner: franklinjunior23
+repo: AppAgentInti
+releaseType: release
+host: github.com
+private: true
+token: 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

@@ -99,9 +99,8 @@ function Setting() {
           {localStorage.getItem('TokenSucursal') && (
             <Button
               disabled
-              variant="second"
               onClick={HandleDeleteToken}
-              className="bg-black py-3 text-sm px-4 ml-5 rounded-md font-semibold"
+              className="bg-black dark:bg-white  py-3 text-sm px-4 ml-5 rounded-md font-semibold"
             >
               Eliminar Token
             </Button>
@@ -137,9 +136,9 @@ function Setting() {
         )} */}
 
         <Button
-          variant="secondary"
+          variant=""
           onClick={handleDatsBack}
-          className=" font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+          className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
         >
           Enviar data
         </Button>

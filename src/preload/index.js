@@ -35,7 +35,6 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
-    console.log('error : 26 preload')
     console.error(error)
   }
 } else {
