@@ -17,6 +17,7 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
+  perMachine: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -39,4 +40,4 @@ appImage:
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://github.com/franklinjunior23/AppAgentInti
