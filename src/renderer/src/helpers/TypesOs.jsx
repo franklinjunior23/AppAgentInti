@@ -4,6 +4,8 @@ export function TypesOs({ platform, className }) {
       return <Windows className={className} />
     case 'linux' || 'Linux':
       return <Linux className={className} />
+    default:
+      return <Windows className={className} />
   }
 }
 
