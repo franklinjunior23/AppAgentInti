@@ -12,6 +12,31 @@ import path from 'path'
 
 let tray = null
 let data_device = null
+Object.defineProperty(app, 'isPackaged', {
+  get() {
+    return true
+  }
+})
+const isDev = process.env.NODE_ENV === 'development'
+if (isDev) {
+  process.env.APPIMAGE = path.join(
+    __dirname,
+    'dist',
+    `Installar_Mapeo_${app.getVersion()}_linux.AppImage`
+  )
+}
+autoUpdater.setFeedURL({
+  provider: 'github',
+  owner: 'franklinjunior23',
+  repo: 'AppAgentInti',
+  channel: 'latest', // Especifica el canal de lanzamiento, como "latest" para obtener las últimas versiones
+  releaseType: 'release', // Especifica el tipo de lanzamiento, como "release" para obtener lanzamientos oficiales
+  host: 'https://github.com', // Especifica el host de GitHub
+  private: true, // Indica que el repositorio es privado
+  token: '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' // Token de acceso personal para acceder al repositorio privado
+})
+
+autoUpdater.checkForUpdatesAndNotify()
 
 async function RequestData() {
   const idDevice = readUserData()?.iddevice
@@ -29,19 +54,9 @@ async function RequestData() {
 }
 
 // Configuración de autoactualización (electron-updater)
-autoUpdater.setFeedURL({
-  provider: 'github',
-  owner: 'franklinjunior23',
-  repo: 'AppAgentInti',
-  releaseType: 'release',
-  host: 'github.com',
-  private: true,
-  token: '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'
-})
 
-// // configs
-// autoUpdater.autoDownload = false
-// autoUpdater.autoInstallOnAppQuit = true
+autoUpdater.autoDownload = false
+autoUpdater.autoInstallOnAppQuit = true
 
 function createWindow() {
   // Create the browser window.
@@ -69,42 +84,38 @@ function createWindow() {
     mainWindow.webContents.send('message', message)
   }
 
-  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-    console.log('Actualización descargada')
-    const dialogOpts = {
-      type: 'info',
-      buttons: ['Restart', 'Later'],
-      title: 'Application Update',
-      message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail: 'Una nueva versión ha sido descargada. Restart the application to apply the updates.'
-    }
-    console.log('lego')
+  // autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  //   console.log('Actualización descargada')
+  //   const dialogOpts = {
+  //     type: 'info',
+  //     buttons: ['Restart', 'Later'],
+  //     title: 'Application Update',
+  //     message: process.platform === 'win32' ? releaseNotes : releaseName,
+  //     detail: 'Una nueva versión ha sido descargada. Restart the application to apply the updates.'
+  //   }
+  //   console.log('lego')
 
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall()
-    })
-  })
+  //   dialog.showMessageBox(dialogOpts).then((returnValue) => {
+  //     if (returnValue.response === 0) autoUpdater.quitAndInstall()
+  //   })
+  // })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  autoUpdater.on('error', (error) => {
-    console.log('Error', error.message)
-  })
-
   mainWindow.webContents.on('did-finish-load', () => {
-    autoUpdater.checkForUpdates()
-    autoUpdater.on('update-not-available', () => {
-      ShowMessage('No hay actualizaciones disponibles.')
-    })
-    autoUpdater.on('checking-for-update', () => {
-      ShowMessage('Buscando actualizaciones...')
-    })
-    autoUpdater.on('update-available', () => {
-      ShowMessage('Actualización disponible...')
-    })
+    // autoUpdater.checkForUpdates()
+    // autoUpdater.on('update-not-available', () => {
+    //   ShowMessage('No hay actualizaciones disponibles.')
+    // })
+    // autoUpdater.on('checking-for-update', () => {
+    //   ShowMessage('Buscando actualizaciones...')
+    // })
+    // autoUpdater.on('update-available', () => {
+    //   ShowMessage('Actualización disponible...')
+    // })
 
     collectSystemInfo()
       .then((data) => {
@@ -205,7 +216,33 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 })
 
 app.whenReady().then(() => {
-  // Set app user model id for windows
+  autoUpdater.on('checking-for-update', () => {
+    console.log('Checking for update...')
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Update available.')
+  })
+
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('Update not available.')
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.log('Error in auto-updater. ' + err)
+  })
+
+  autoUpdater.on('download-progress', (progressObj) => {
+    console.log('Download progress...')
+    // let log_message = 'Download speed: ' + progressObj.bytesPerSecond
+    // log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
+    // log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
+    // console.log(log_message)
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Update downloaded')
+  })
 
   electronApp.setAppUserModelId('com.electron')
 

@@ -5,12 +5,18 @@ import { toast } from 'react-toastify'
 import { useDataSystem } from '../store/Use-data-system'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { UseAuthDevice } from '@/hoocks/UseRegister-Device'
 
 function Setting() {
   const { datainformation } = useDataSystem()
   const [DataToken, setDataToken] = useState(localStorage.getItem('TokenSucursal') ?? '')
+
   const { data, AddDispositivoId, iDDispositivo, CloseOpenAuth, TrueOpenAuth } = DataInformationPC()
-  const Data_empresa = JSON.parse(localStorage.getItem('Data_Empresa'))
+
+  const Data_empresa = JSON.parse(localStorage.getItem('Data_Empresa') ?? null)
+
+  // Auth import
+  const { mutate: MutateAuth, isLoading: LoadingAuth } = UseAuthDevice()
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -26,31 +32,19 @@ function Setting() {
     }
   }, [])
 
-  function HandleStorageDevice({ data }) {
-    window.electron.ipcRenderer.send('device-data', data)
-  }
-
   async function handleSubmiting() {
     try {
       if (DataToken === '') {
         alert('Error el token no puede estar vacio')
         return toast.info('No se puede guardar un token vacio')
       }
-      const { data } = await AxiosRest.post('/Dispositivos/Agent/Auth', {
+      const data_body = {
         TokenSucursal: DataToken,
+        nameDevice: datainformation?.osInfo?.hostname,
         IdDispositivo: localStorage.getItem('IdDispositivo') ?? null
-      })
-
-      if (data.auth === false) {
-        return toast.error(data.message)
       }
-      TrueOpenAuth()
-      HandleStorageDevice({ data: data.Id })
-      localStorage.setItem('IdDispositivo', data.Id)
+      MutateAuth(data_body)
       localStorage.setItem('TokenSucursal', DataToken)
-      localStorage.setItem('Data_Empresa', JSON.stringify(data.Data_empresa))
-      AddDispositivoId(data.Id)
-      return toast.success(data.message)
     } catch (error) {
       toast.error(error.message)
     }
@@ -89,18 +83,18 @@ function Setting() {
           </div>
           {!localStorage.getItem('TokenSucursal') && (
             <Button
-              disabled={localStorage.getItem('TokenSucursal')}
+              disabled={LoadingAuth | localStorage.getItem('TokenSucursal')}
               onClick={handleSubmiting}
-              className="bg-black py-3 text-sm px-4 ml-5 rounded-md font-semibold"
+              className=" py-3 text-sm px-4 ml-5 rounded-md font-semibold"
             >
-              Guardar Token
+              {LoadingAuth ? 'Cargando ...' : 'Guardar Token'}
             </Button>
           )}
           {localStorage.getItem('TokenSucursal') && (
             <Button
               disabled
               onClick={HandleDeleteToken}
-              className="bg-black dark:bg-white  py-3 text-sm px-4 ml-5 rounded-md font-semibold"
+              className=" dark:bg-white  py-3 text-sm px-4 ml-5 rounded-md font-semibold"
             >
               Eliminar Token
             </Button>
