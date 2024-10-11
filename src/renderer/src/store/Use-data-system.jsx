@@ -21,7 +21,6 @@ export const ProvideSystemData = ({ children }) => {
   useEffect(() => {
     window.electron.ipcRenderer.on('message', (event, message) => {
       console.log('Mensaje recibido en el componente de React:', message)
-      // Aquí puedes hacer cualquier otra cosa con el mensaje recibido
     })
 
     return () => {
@@ -30,25 +29,18 @@ export const ProvideSystemData = ({ children }) => {
   }, []) // Asegurarse de que este efecto se ejecute solo una vez
 
   useEffect(() => {
-    // Función para obtener y establecer la información del sistema
-    const fetchSystemInfo = () => {
-      window.api.getOs().then((data) => {
-        console.log(data)
-        setdatainformation(data)
-      })
-    }
+    // Escuchar la información del sistema desde el backend
+    window.systemAPI.onSystemInfo((data) => {
+      console.log('Información del sistema recibida:', data)
+      setdatainformation(data)
+    })
 
-    // Llamar a fetchSystemInfo inmediatamente cuando se monta el componente
-    fetchSystemInfo()
-
-    // Establecer un intervalo para llamar fetchSystemInfo cada 3 minutos
-    const intervalId = setInterval(fetchSystemInfo, 3 * 60 * 1000) // 3 minutos en milisegundos
-
-    // Limpia el intervalo cuando el componente se desmonta o cuando datainformation cambia
+    // Limpiar el listener cuando el componente se desmonta
     return () => {
-      clearInterval(intervalId)
+      window.systemAPI.removeSystemInfoListener()
     }
-  }, []) // No necesitas incluir datainformation en las dependencias porque el efecto solo se ejecuta una vez al montar el componente
+  }, [])
+  // No necesitas incluir datainformation en las dependencias porque el efecto solo se ejecuta una vez al montar el componente
 
   useEffect(() => {
     function handleStorage() {

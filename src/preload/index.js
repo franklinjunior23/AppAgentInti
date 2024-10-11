@@ -27,6 +27,18 @@ contextBridge.exposeInMainWorld('systemAPI', {
         resolve(systemReport)
       })
     })
+  },
+  // Nuevo método para escuchar eventos periódicos
+  // Escuchar el evento 'SystemInfo' para recibir la información del sistema
+  onSystemInfo: (callback) => {
+    ipcRenderer.on('SystemInfo', (event, data) => callback(data))
+  },
+  sendSignDevice: (data) => ipcRenderer.send('conect-user', data),
+  refreshData: () => ipcRenderer.send('refresh-data'),
+
+  // Limpiar los listeners cuando ya no sean necesarios
+  removeSystemInfoListener: () => {
+    ipcRenderer.removeAllListeners('SystemInfo')
   }
 })
 

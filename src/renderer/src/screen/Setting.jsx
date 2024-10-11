@@ -6,6 +6,7 @@ import { useDataSystem } from '../store/Use-data-system'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { UseAuthDevice } from '@/hoocks/UseRegister-Device'
+import { CpuBrand, isVerifiyDevice } from '@/helpers/types-setting'
 
 function Setting() {
   const { datainformation } = useDataSystem()
@@ -18,9 +19,98 @@ function Setting() {
   // Auth import
   const { mutate: MutateAuth, isLoading: LoadingAuth } = UseAuthDevice()
 
+  async function handleDatsBack() {
+    if (!DataToken) {
+      alert('No se ha seleccionado una sucursal')
+      return
+    }
+
+    const { data: DataApi } = await AxiosRest.post('/device', {
+      isRegisterAgent: true,
+      name: datainformation.osInfo.hostname,
+      status: 'Activo',
+      nickName: '',
+      branchId: DataToken,
+      information: {
+        type: isVerifiyDevice(datainformation.battery.hasBattery),
+        typeDevice: isVerifiyDevice(datainformation.battery.hasBattery),
+        serialNumber: datainformation.uuid.os,
+        typeConection: '',
+        brand: '',
+        model: ''
+      },
+      os: {
+        platform: datainformation.osInfo.platform ?? 'No disponible',
+        distro: datainformation.osInfo.distro ?? 'No disponible',
+        release: datainformation.osInfo.release ?? 'No disponible',
+        architecture: datainformation.osInfo.arch ?? 'No disponible',
+        kernel: datainformation.osInfo.kernel ?? 'No disponible',
+        build: datainformation.osInfo.build ?? 'No disponible',
+        serial: datainformation.osInfo.serial ?? 'No disponible',
+        uefi: datainformation.osInfo.uefi ?? 'No disponible',
+        fqdn: datainformation.osInfo.fqdn ?? 'No disponible'
+      },
+      motherboard: {
+        brand: datainformation.baseboard.manufacturer ?? 'No disponible',
+        model: datainformation.baseboard.model ?? 'No disponible',
+        quantitySlots: datainformation.baseboard.memMax ?? 0
+      },
+      cpu: {
+        brand: CpuBrand(datainformation.cpu.brand),
+        model: datainformation.cpu.brand,
+        cores: datainformation.cpu.cores ?? 0,
+        threads: datainformation.cpu.physicalCores ?? 0
+      },
+      gpu: [
+        datainformation.graphics.controllers?.map((item) => ({
+          brand: CpuBrand(item.vendor),
+          model: item.model,
+          position: item.bus,
+          vram: item.vram
+        }))
+      ],
+      network: [
+        datainformation.networkInterfaces.map((item) => ({
+          name: item.ifaceName,
+          ip4: item.ip4,
+          ip6: item.ip6,
+          type: item.type ?? 'Uknown',
+          speed: item.speed ?? 'Error',
+          status: item.operstate ?? 'Error',
+          isDhcp: Boolean(item.dhcp ?? false),
+          isVirtual: Boolean(item.virtual ?? false)
+        }))
+      ],
+      storage: [
+        datainformation.diskLayout.map((item) => ({
+          brand: item.vendor ?? 'No disponible',
+          model: item.name ?? 'No disponible',
+          capacity: item.size,
+          type: item.type
+        }))
+      ]
+    })
+    window.systemAPI.sendSignDevice({
+      id_device: DataApi.id_device
+    })
+
+    localStorage.setItem('id_device', DataApi.id_device)
+    return toast.info(DataApi.message)
+  }
+  function HandleDeleteToken() {
+    CloseOpenAuth()
+    localStorage.removeItem('TokenSucursal')
+    localStorage.removeItem('id_device')
+    localStorage.removeItem('Data_Empresa')
+    AddDispositivoId(0)
+    return alert('Token Borrado')
+  }
+
+  function exampleEvente() {}
+
   useEffect(() => {
     const handleStorageChange = () => {
-      setDataToken(localStorage.getItem('TokenSucursal') || '')
+      setDataToken(localStorage.getItem('id_device') || '')
     }
 
     // Suscribirse al evento de cambio en el localStorage
@@ -32,40 +122,6 @@ function Setting() {
     }
   }, [])
 
-  async function handleSubmiting() {
-    try {
-      if (DataToken === '') {
-        alert('Error el token no puede estar vacio')
-        return toast.info('No se puede guardar un token vacio')
-      }
-      const data_body = {
-        TokenSucursal: DataToken,
-        nameDevice: datainformation?.osInfo?.hostname,
-        IdDispositivo: localStorage.getItem('IdDispositivo') ?? null
-      }
-      MutateAuth(data_body)
-      localStorage.setItem('TokenSucursal', DataToken)
-    } catch (error) {
-      toast.error(error.message)
-    }
-  }
-
-  async function handleDatsBack() {
-    const { data: DataApi } = await AxiosRest.post('/Dispositivos/Agent', {
-      ...datainformation,
-      IdDipositivo: localStorage.getItem('IdDispositivo')
-    })
-    return toast.info(DataApi.message)
-  }
-  function HandleDeleteToken() {
-    CloseOpenAuth()
-    localStorage.removeItem('TokenSucursal')
-    localStorage.removeItem('IdDispositivo')
-    localStorage.removeItem('Data_Empresa')
-    AddDispositivoId(0)
-    return alert('Token Borrado')
-  }
-
   return (
     <>
       <main className="mx-4">
@@ -76,41 +132,18 @@ function Setting() {
               readOnly={localStorage.getItem('TokenSucursal')}
               type="text"
               onChange={(e) => setDataToken(e.target.value)}
-              value={DataToken}
+              value={datainformation.id_device ?? DataToken}
               className=" w-full mt-1 px-3 py-3 indent-1 rounded-md focus:outline-none text-sm"
               placeholder="Introducir el token"
             />
           </div>
-          {!localStorage.getItem('TokenSucursal') && (
-            <Button
-              disabled={LoadingAuth | localStorage.getItem('TokenSucursal')}
-              onClick={handleSubmiting}
-              className=" py-3 text-sm px-4 ml-5 rounded-md font-semibold"
-            >
-              {LoadingAuth ? 'Cargando ...' : 'Guardar Token'}
-            </Button>
-          )}
-          {localStorage.getItem('TokenSucursal') && (
-            <Button
-              disabled
-              onClick={HandleDeleteToken}
-              className=" dark:bg-white  py-3 text-sm px-4 ml-5 rounded-md font-semibold"
-            >
-              Eliminar Token
-            </Button>
-          )}
         </header>
         <header>
           {localStorage.getItem('IdDispositivo') && (
             <header className="flex gap-2 mt-5">
               <div className="grid">
                 <label className="text-sm">Id Dispositivo</label>
-                <Input
-                  type="text"
-                  className=" w-[100px] text-sm"
-                  readOnly
-                  value={localStorage.getItem('IdDispositivo')}
-                />
+                <Input type="text" className=" w-[100px] text-sm" readOnly value={DataToken} />
               </div>
               <div className="grid">
                 <label className="text-sm">Empresa</label>
@@ -131,11 +164,24 @@ function Setting() {
 
         <Button
           variant=""
+          disabled={Boolean(datainformation.id_device)}
           onClick={handleDatsBack}
           className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
         >
           Enviar data
         </Button>
+
+        {datainformation.id_device && (
+          <Button
+            variant=""
+            onClick={() => {
+              window.systemAPI.refreshData()
+            }}
+            className="dark:bg-white ml-3  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+          >
+            Refrescar data
+          </Button>
+        )}
       </main>
     </>
   )

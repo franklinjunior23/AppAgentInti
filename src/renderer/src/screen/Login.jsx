@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import PropTypes from 'prop-types'
 import { useMutation } from 'react-query'
 import { AxiosRest, CONFIGDATAAPI } from '../helpers/ApiConfig'
 import { useNavigate } from 'react-router-dom'
@@ -80,9 +79,4 @@ function ComponentInput({ name, register, label }) {
       />
     </div>
   )
-}
-ComponentInput.prototype = {
-  name: PropTypes.string,
-  register: PropTypes.func,
-  label: PropTypes.string
 }

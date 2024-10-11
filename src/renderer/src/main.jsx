@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import './assets/index.css'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
-import { Home, Info, Setting, Update } from './screen'
+import { Home, Setting } from './screen'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
@@ -25,11 +25,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <Route path="/" index element={<Home />} />
               <Route path="/aplications" element={<PageAplications />} />
               <Route path="/Setting" element={<Setting />} />
-              <Route path="/Help" element={<Info />} />
               <Route path="/history" element={<History />} />
-              <Route path="/Update" element={<Update />} />
               <Route path="/Support" element={<Support />} />
-              <Route path="/Report" element={<>Reportes</>} />
+              <Route path="/help" element={<>Reportes</>} />
             </Route>
           </Routes>
         </Router>

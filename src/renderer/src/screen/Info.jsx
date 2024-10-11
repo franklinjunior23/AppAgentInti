@@ -3,7 +3,7 @@ import Header from '../componentes/Header'
 function Info() {
   return (
     <>
-      <main className=" text-white">
+      <main className=" p-6">
         <h1 className="font-semibold text-2xl my-3">Agente IntisCorp</h1>
         <p className="text-pretty text-sm">
           Bienvenido al servicio de asistencia del Agente IntisCorp. Estamos aquí para ayudarte en

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 function Support() {
   return (
     <>
-      <main className="">
+      <main className="p-5">
         <h1 className="font-semibold text-2xl my-3 ">Soporte Ticket</h1>
         <section className="grid">
           <label>Mencionar Titulo de su Problema</label>
@@ -17,10 +17,10 @@ function Support() {
           <Textarea className="w-full text-sm" rows="10"></Textarea>
         </section>
         <Button
+          className="mt-4"
           onClick={() => {
             toast.info('Proximamente se estara habilitando esta seccion ')
           }}
-          className="bg-black  mt-5 rounded-md"
         >
           Crear Ticket
         </Button>

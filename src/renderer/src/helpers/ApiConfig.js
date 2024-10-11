@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // eslint-disable-next-line no-undef
 export const CONFIGDATAAPI = {
-  API_DOMAIN: 'https://dev.intisoft.com.pe',
+  API_DOMAIN: 'http://localhost:3000',
   API_VERSION: '/api/v1',
   TOKEN_USER: 'usuario_tk_invent_seg'
 }
@@ -17,5 +17,3 @@ AxiosRest.interceptors.request.use((config) => {
   }
   return config
 })
-//https://dev.intisoft.com.pe
-//http://localhost:3000

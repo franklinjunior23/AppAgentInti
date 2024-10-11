@@ -1,44 +1,49 @@
-import { app, shell, BrowserWindow, ipcMain, Tray, Menu, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Tray, Menu, dialog, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { collectSystemInfo } from './SystemInfo'
 import AutoLaunch from 'auto-launch'
-import { autoUpdater } from 'electron-updater'
 import { NameFunction } from './types'
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
+import cron from 'node-cron'
 
 let tray = null
 let data_device = null
+let deviceDataNew = null
+let api_url = 'https://dev.intisoft.com.pe/api/v1'
+
+app.relaunch = true
+
+// CONFIGURACON PARA AUTO UPDATE
+
 Object.defineProperty(app, 'isPackaged', {
   get() {
     return true
   }
 })
+app.disableHardwareAcceleration()
 const isDev = process.env.NODE_ENV === 'development'
 if (isDev) {
+  api_url = 'http://localhost:3000/api/v1'
   process.env.APPIMAGE = path.join(
     __dirname,
     'dist',
     `Installar_Mapeo_${app.getVersion()}_linux.AppImage`
   )
 }
-autoUpdater.setFeedURL({
-  provider: 'github',
-  owner: 'franklinjunior23',
-  repo: 'AppAgentInti',
-  channel: 'latest', // Especifica el canal de lanzamiento, como "latest" para obtener las últimas versiones
-  releaseType: 'release', // Especifica el tipo de lanzamiento, como "release" para obtener lanzamientos oficiales
-  host: 'https://github.com', // Especifica el host de GitHub
-  private: true, // Indica que el repositorio es privado
-  token: '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' // Token de acceso personal para acceder al repositorio privado
-})
 
-autoUpdater.checkForUpdatesAndNotify()
+const appDirectory = path.dirname(app.getPath('exe'))
+const filePath = path.join(appDirectory, 'configUserConfig.json')
 
-async function RequestData() {
+async function RequestData(data) {
+  fs.writeFileSync(
+    filePath,
+    JSON.stringify({ device_id: data.id, company: data.company, branch: data.branch })
+  )
+
   const idDevice = readUserData()?.iddevice
   if (!idDevice) return
   try {
@@ -53,18 +58,14 @@ async function RequestData() {
   }
 }
 
-// Configuración de autoactualización (electron-updater)
-
-autoUpdater.autoDownload = false
-autoUpdater.autoInstallOnAppQuit = true
-
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 960,
-    height: 580,
+    width: 900,
+    height: 500,
     show: false,
     resizable: false,
+    center: true,
     autoHideMenuBar: true,
     vibrancy: 'under-window',
     visualEffectState: 'active',
@@ -80,65 +81,76 @@ function createWindow() {
     mainWindow.show()
   })
 
-  function ShowMessage(message) {
-    mainWindow.webContents.send('message', message)
-  }
+  // 10 segundos para traer la data
 
-  // autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-  //   console.log('Actualización descargada')
-  //   const dialogOpts = {
-  //     type: 'info',
-  //     buttons: ['Restart', 'Later'],
-  //     title: 'Application Update',
-  //     message: process.platform === 'win32' ? releaseNotes : releaseName,
-  //     detail: 'Una nueva versión ha sido descargada. Restart the application to apply the updates.'
-  //   }
-  //   console.log('lego')
-
-  //   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-  //     if (returnValue.response === 0) autoUpdater.quitAndInstall()
-  //   })
-  // })
+  cron.schedule('*/10 * * * * ', async () => {
+    collectSystemInfo()
+      .then((data) => {
+        data_device = data
+        console.log('enviando')
+        mainWindow.webContents.send('SystemInfo', data)
+      })
+      .catch((error) => {
+        console.error('Error al recopilar información del sistema:', error)
+      })
+  })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  mainWindow.webContents.on('did-finish-load', () => {
-    // autoUpdater.checkForUpdates()
-    // autoUpdater.on('update-not-available', () => {
-    //   ShowMessage('No hay actualizaciones disponibles.')
-    // })
-    // autoUpdater.on('checking-for-update', () => {
-    //   ShowMessage('Buscando actualizaciones...')
-    // })
-    // autoUpdater.on('update-available', () => {
-    //   ShowMessage('Actualización disponible...')
-    // })
+  ipcMain.on('conect-user', (event, data) => {
+    try {
+      const appDirectory = path.dirname(app.getPath('exe'))
+      const filePath = path.join(appDirectory, 'configUserConfig.json')
 
+      fs.writeFileSync(filePath, JSON.stringify(data))
+
+      const device = fs.readFileSync(filePath, 'utf-8')
+
+      collectSystemInfo()
+        .then((data) => {
+          data_device = data
+          mainWindow.webContents.send('SystemInfo', data)
+        })
+        .catch((error) => {
+          console.error('Error al recopilar la información inicial del sistema:', error)
+        })
+    } catch (error) {
+      console.log('Error al guardar el archivo:', error)
+    }
+  })
+  ipcMain.on('refresh-data', async (event) => {
+    console.log(api_url, data_device.id_device)
+    const param = await axios.patch(`${api_url}/device/${data_device.id_device}`, {
+      name: data_device.osInfo.hostname
+    })
+    console.log(param.data)
+  })
+
+  mainWindow.webContents.on('did-finish-load', () => {
     collectSystemInfo()
       .then((data) => {
-        mainWindow.webContents.send('SystemInfo', [data])
+        data_device = data
+        mainWindow.webContents.send('SystemInfo', data)
       })
       .catch((error) => {
-        console.error('Error al recopilar información del sistema:', error)
+        console.error('Error al recopilar la información inicial del sistema:', error)
       })
 
-    // */10 * * * *
-    // 10 minutos de retraso para enviar la data
-    // cron.schedule('*/10 * * * *', async () => {
-    //   const idDevice = readUserData()?.iddevice
-    //   if (!idDevice) return
-    //   try {
-    //     // Lógica para enviar información a la API
-    //     const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
-    //       IdDipositivo: idDevice,
-    //       data_device
-    //     })
-    //   } catch (error) {
-    //   }
-    // })
+    cron.schedule('*/10 * * * *', async () => {
+      try {
+        const filedata = fs.readFileSync(filePath, 'utf-8')
+        const data = JSON.parse(filedata)
+
+        if (!data.device_id) return
+
+        console.log('si existr')
+      } catch (error) {
+        console.log('No existe el archivo')
+      }
+    })
   })
 
   // HMR for renderer based on electron-vite cli.
@@ -216,35 +228,11 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 })
 
 app.whenReady().then(() => {
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for update...')
-  })
+  // Iniciar la aplicación en segundo plano
+  createWindow()
 
-  autoUpdater.on('update-available', (info) => {
-    console.log('Update available.')
-  })
-
-  autoUpdater.on('update-not-available', (info) => {
-    console.log('Update not available.')
-  })
-
-  autoUpdater.on('error', (err) => {
-    console.log('Error in auto-updater. ' + err)
-  })
-
-  autoUpdater.on('download-progress', (progressObj) => {
-    console.log('Download progress...')
-    // let log_message = 'Download speed: ' + progressObj.bytesPerSecond
-    // log_message = log_message + ' - Downloaded ' + progressObj.percent + '%'
-    // log_message = log_message + ' (' + progressObj.transferred + '/' + progressObj.total + ')'
-    // console.log(log_message)
-  })
-
-  autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded')
-  })
-
-  electronApp.setAppUserModelId('com.electron')
+  // Configurar el autoinicio de la aplicación
+  electronApp.setAppUserModelId('com.intiscorp.agentinventory')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -255,10 +243,9 @@ app.whenReady().then(() => {
 
   ipcMain.on('device-data', StorageDevice)
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // Evento para recibir datos del dispositivo
 
-  createWindow()
+  ipcMain.on('ping', () => console.log('pong'))
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
@@ -266,18 +253,12 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  autoUpdater.checkForUpdates()
-
   app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
       // app.isQuiting = true
       app.quit() // Quit the app when all windows are closed, except on macOS.
     }
   })
-})
-
-process.on('uncaughtException', function (error) {
-  console.error('uncaughtException', error)
 })
 
 export function StorageDevice(event, data) {
