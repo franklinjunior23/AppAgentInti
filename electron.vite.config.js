@@ -14,6 +14,15 @@ export default defineConfig({
   preload: {
     plugins: [externalizeDepsPlugin()]
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://dev.intisoft.com.pe', // Cambia esto a la URL de tu backend NestJS
+        changeOrigin: true,
+        secure: true // Si no estás usando HTTPS en el backend
+      }
+    }
+  },
   renderer: {
     resolve: {
       alias: {

@@ -1,4 +1,14 @@
-import { app, shell, BrowserWindow, ipcMain, Tray, Menu, dialog, Notification } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  ipcMain,
+  Tray,
+  Menu,
+  dialog,
+  Notification,
+  session
+} from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -234,6 +244,16 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 app.whenReady().then(() => {
   // Iniciar la aplicación en segundo plano
   createWindow()
+  // session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+  //   // Agrega la cabecera 'Origin' para las solicitudes salientes
+  //   details.requestHeaders['Origin'] = 'http://localhost:3005'
+
+  //   // Asegúrate de permitir todas las cabeceras necesarias
+  //   details.requestHeaders['Access-Control-Allow-Origin'] = 'http://localhost:3005'
+  //   details.requestHeaders['Access-Control-Allow-Credentials'] = 'true'
+
+  //   callback({ requestHeaders: details.requestHeaders })
+  // })
 
   // Configurar el autoinicio de la aplicación
   electronApp.setAppUserModelId('com.intiscorp.agentinventory')

@@ -8,12 +8,11 @@ export const CONFIGDATAAPI = {
 }
 
 export const AxiosRest = axios.create({
-  baseURL: CONFIGDATAAPI.API_DOMAIN + CONFIGDATAAPI.API_VERSION
-})
-AxiosRest.interceptors.request.use((config) => {
-  const token = localStorage.getItem(CONFIGDATAAPI.TOKEN_USER) // Obtener el token almacenado en el localStorage
-  if (token) {
-    config.headers['Validation'] = token // Agregar el token al encabezado de la solicitud
-  }
-  return config
+  baseURL: CONFIGDATAAPI.API_DOMAIN + CONFIGDATAAPI.API_VERSION,
+  header: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*'
+  },
+  withCredentials: true
 })
