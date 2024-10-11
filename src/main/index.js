@@ -38,26 +38,7 @@ if (isDev) {
 const appDirectory = path.dirname(app.getPath('exe'))
 const filePath = path.join(appDirectory, 'configUserConfig.json')
 
-async function RequestData(data) {
-  fs.writeFileSync(
-    filePath,
-    JSON.stringify({ device_id: data.id, company: data.company, branch: data.branch })
-  )
-
-  const idDevice = readUserData()?.iddevice
-  if (!idDevice) return
-  try {
-    // Lógica para enviar información a la API
-    const response = await axios.post('https://dev.intisoft.com.pe/api/v1/Dispositivos/Agent', {
-      IdDipositivo: idDevice,
-      data_device
-    })
-    console.log('Información enviada correctamente:', response.data)
-  } catch (error) {
-    console.error('Error al enviar información a la API:', error)
-  }
-}
-
+console.log('Ruta del archivo:', filePath)
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -121,6 +102,29 @@ function createWindow() {
       console.log('Error al guardar el archivo:', error)
     }
   })
+  ipcMain.on('desvincule-device', (event) => {
+    try {
+      const appDirectory = path.dirname(app.getPath('exe'))
+      const filePath = path.join(appDirectory, 'configUserConfig.json')
+      fs.writeFileSync(
+        filePath,
+        JSON.stringify({
+          id_device: null
+        })
+      )
+      collectSystemInfo()
+        .then((data) => {
+          data_device = data
+          mainWindow.webContents.send('SystemInfo', data)
+        })
+        .catch((error) => {
+          console.error('Error al recopilar la información inicial del sistema:', error)
+        })
+    } catch (error) {
+      console.log('Error al desvincular el dispositivo:', error)
+    }
+  })
+
   ipcMain.on('refresh-data', async (event) => {
     console.log(api_url, data_device.id_device)
     const param = await axios.patch(`${api_url}/device/${data_device.id_device}`, {

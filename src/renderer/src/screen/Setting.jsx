@@ -106,7 +106,15 @@ function Setting() {
     return alert('Token Borrado')
   }
 
-  function exampleEvente() {}
+  function removeIdDevice() {
+    const confirmed = window.confirm(
+      '¿Estás seguro de que deseas borrar la vinculación del dispositivo?'
+    )
+    if (!confirmed) return
+    // Lógica para borrar la vinculación
+    alert('La vinculación ha sido eliminada.')
+    window.systemAPI.removeIdDevice()
+  }
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -162,24 +170,37 @@ function Setting() {
           </>
         )} */}
 
-        <Button
-          variant=""
-          disabled={Boolean(datainformation.id_device)}
-          onClick={handleDatsBack}
-          className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
-        >
-          Enviar data
-        </Button>
+        <div>
+          <Button
+            variant=""
+            disabled={Boolean(datainformation.id_device)}
+            onClick={handleDatsBack}
+            className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+          >
+            Enviar data
+          </Button>
 
+          {datainformation.id_device && (
+            <Button
+              variant=""
+              onClick={() => {
+                window.systemAPI.refreshData()
+              }}
+              className="dark:bg-white ml-3  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+            >
+              Refrescar data
+            </Button>
+          )}
+        </div>
         {datainformation.id_device && (
           <Button
             variant=""
             onClick={() => {
-              window.systemAPI.refreshData()
+              removeIdDevice()
             }}
-            className="dark:bg-white ml-3  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+            className="dark:bg-white font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
           >
-            Refrescar data
+            Eliminar Vinculacion
           </Button>
         )}
       </main>

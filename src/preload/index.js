@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld('systemAPI', {
   },
   sendSignDevice: (data) => ipcRenderer.send('conect-user', data),
   refreshData: () => ipcRenderer.send('refresh-data'),
+  removeIdDevice: () => ipcRenderer.send('desvincule-device'),
 
   // Limpiar los listeners cuando ya no sean necesarios
   removeSystemInfoListener: () => {
