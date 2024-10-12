@@ -7,7 +7,7 @@ export function CpuBrand(brand) {
     return 'Intel'
   }
   // Verificar si contiene "amd" o "rizen"
-  else if (lowerCaseBrand.includes('amd') || lowerCaseBrand.includes('rizen')) {
+  else if (lowerCaseBrand.includes('amd') || lowerCaseBrand.includes('ryzen')) {
     return 'AMD'
   }
 
