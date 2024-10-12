@@ -45,8 +45,17 @@ if (isDev) {
   )
 }
 
-const appDirectory = path.dirname(app.getPath('exe'))
-const filePath = path.join(appDirectory, 'configUserConfig.json')
+const programDataPath = process.platform === 'win32' 
+? path.join(process.env['ProgramData'], 'agente-intisoft') 
+: app.getPath('appData');  // Para otros sistemas operativos
+
+// Asegúrate de que el directorio exista, si no, créalo
+if (!fs.existsSync(programDataPath)) {
+  fs.mkdirSync(programDataPath, { recursive: true });  // Crea los directorios de manera recursiva
+}
+
+// Crear la ruta completa del archivo en ProgramData
+const filePath = path.join(programDataPath, 'configUserConfig.json');
 
 console.log('Ruta del archivo:', filePath)
 function createWindow() {
@@ -93,12 +102,7 @@ function createWindow() {
 
   ipcMain.on('conect-user', async (event, data) => {
     try {
-      const appDirectory = path.dirname(app.getPath('exe'))
-      const filePath = path.join(appDirectory, 'configUserConfig.json')
-
-      await fs.writeFileSync(filePath, JSON.stringify(data))
-
-      const device = await fs.readFileSync(filePath, 'utf-8')
+     fs.writeFileSync(filePath, JSON.stringify(data))
 
       collectSystemInfo()
         .then((data) => {
@@ -112,11 +116,9 @@ function createWindow() {
       console.log('Error al guardar el archivo:', error)
     }
   })
-  ipcMain.on('desvincule-device', async (event) => {
+  ipcMain.on('desvincule-device',  (event) => {
     try {
-      const appDirectory = path.dirname(app.getPath('exe'))
-      const filePath = path.join(appDirectory, 'configUserConfig.json')
-      await fs.writeFileSync(
+       fs.writeFileSync(
         filePath,
         JSON.stringify({
           id_device: null

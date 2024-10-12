@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // eslint-disable-next-line no-undef
 export const CONFIGDATAAPI = {
-  API_DOMAIN: 'http://localhost:3000',
+  API_DOMAIN: 'https://dev.intisoft.com.pe',
   API_VERSION: '/api/v1',
   TOKEN_USER: 'usuario_tk_invent_seg'
 }

@@ -18,5 +18,5 @@ export function CpuBrand(brand) {
 export function isVerifiyDevice(battery) {
   if (battery) return 'Laptop'
 
-  return 'PC'
+  return 'Pc'
 }

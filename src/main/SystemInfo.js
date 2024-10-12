@@ -32,8 +32,12 @@ export async function collectSystemInfo() {
     //   time: '*',
     //   cpuTemperature: '*'
     // })
-    const appDirectory = path.dirname(app.getPath('exe'))
-    const filePath = path.join(appDirectory, 'configUserConfig.json')
+    const programDataPath = process.platform === 'win32' 
+    ? path.join(process.env['ProgramData'], 'agente-intisoft') 
+    : app.getPath('appData');  // Para otros sistemas operativos
+    
+    // Crear la ruta completa del archivo en ProgramData
+    const filePath = path.join(programDataPath, 'configUserConfig.json');
 
     let device_id = null
     try {
@@ -41,6 +45,7 @@ export async function collectSystemInfo() {
 
       device_id = JSON.parse(data)?.id_device
     } catch (error) {
+      console.log(error.message)
       console.error('Error al leer el archivo de configuración:')
     }
 
