@@ -91,14 +91,14 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  ipcMain.on('conect-user', (event, data) => {
+  ipcMain.on('conect-user', async (event, data) => {
     try {
       const appDirectory = path.dirname(app.getPath('exe'))
       const filePath = path.join(appDirectory, 'configUserConfig.json')
 
-      fs.writeFileSync(filePath, JSON.stringify(data))
+      await fs.writeFileSync(filePath, JSON.stringify(data))
 
-      const device = fs.readFileSync(filePath, 'utf-8')
+      const device = await fs.readFileSync(filePath, 'utf-8')
 
       collectSystemInfo()
         .then((data) => {
@@ -112,11 +112,11 @@ function createWindow() {
       console.log('Error al guardar el archivo:', error)
     }
   })
-  ipcMain.on('desvincule-device', (event) => {
+  ipcMain.on('desvincule-device', async (event) => {
     try {
       const appDirectory = path.dirname(app.getPath('exe'))
       const filePath = path.join(appDirectory, 'configUserConfig.json')
-      fs.writeFileSync(
+      await fs.writeFileSync(
         filePath,
         JSON.stringify({
           id_device: null
