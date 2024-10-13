@@ -61,34 +61,28 @@ function Setting() {
         cores: datainformation.cpu.cores ?? 0,
         threads: datainformation.cpu.physicalCores ?? 0
       },
-      gpu: [
-        datainformation.graphics.controllers?.map((item) => ({
-          brand: CpuBrand(item.vendor),
-          model: item.model,
-          position: item.bus,
-          vram: item.vram
-        }))
-      ],
-      network: [
-        datainformation.networkInterfaces.map((item) => ({
-          name: item.ifaceName,
-          ip4: item.ip4,
-          ip6: item.ip6,
-          type: item.type ?? 'Uknown',
-          speed: item.speed ?? 'Error',
-          status: item.operstate ?? 'Error',
-          isDhcp: Boolean(item.dhcp ?? false),
-          isVirtual: Boolean(item.virtual ?? false)
-        }))
-      ],
-      storage: [
-        datainformation.diskLayout.map((item) => ({
-          brand: item.vendor ?? 'No disponible',
-          model: item.name ?? 'No disponible',
-          capacity: item.size,
-          type: item.type
-        }))
-      ]
+      gpu: datainformation.graphics.controllers?.map((item) => ({
+        brand: CpuBrand(item.vendor),
+        model: item.model,
+        position: item.bus,
+        vram: item.vram
+      })),
+      network: datainformation.networkInterfaces.map((item) => ({
+        name: item.ifaceName,
+        ip4: item.ip4,
+        ip6: item.ip6,
+        type: item.type ?? 'Uknown',
+        speed: item.speed ?? 'Error',
+        status: item.operstate ?? 'Error',
+        isDhcp: Boolean(item.dhcp ?? false),
+        isVirtual: Boolean(item.virtual ?? false)
+      })),
+      storage: datainformation.diskLayout.map((item) => ({
+        brand: item.vendor ?? 'No disponible',
+        model: item.name ?? 'No disponible',
+        capacity: item.size,
+        type: item.type
+      }))
     })
     window.systemAPI.sendSignDevice({
       id_device: DataApi.id_device
