@@ -33,7 +33,8 @@ function Setting() {
       branchId: DataToken,
       information: {
         type: isVerifiyDevice(datainformation.battery.hasBattery),
-        typeDevice: isVerifiyDevice(datainformation.battery.hasBattery),
+        typeDevice:
+          isVerifiyDevice(datainformation.battery.hasBattery) === 'Pc' ? 'Compatible' : 'Netboock',
         serialNumber: datainformation.uuid.os,
         typeConection: '',
         brand: '',
