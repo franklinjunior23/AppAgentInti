@@ -83,7 +83,15 @@ function Setting() {
         model: item.name ?? 'No disponible',
         capacity: item.size,
         type: item.type
+      })),
+      ram: datainformation.memLayout.map((item)=>({
+        brand : item.manufacturer ?? 'No disponible',
+        model: item.partNum ?? 'No disponible',
+        type : item.type ?? 'No disponible',
+        capacity : item.size ?? 0,
+        speed : item.clockSpeed
       }))
+      
     })
     window.systemAPI.sendSignDevice({
       id_device: DataApi.id_device
