@@ -6,12 +6,13 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import 'react-toastify/dist/ReactToastify.css'
 import { ToastContainer } from 'react-toastify'
 import Support from './screen/Support'
-import Layaout from './screen/Layaout'
+
 import { ProvideSystemData } from './store/Use-data-system'
 import '@fontsource-variable/inter'
 import PageAplications from './screen/Aplications'
 import History from './screen/History'
 import { ThemeProvider } from './provider/Theme'
+import Layaout from './layaout/default'
 
 const queryClient = new QueryClient()
 

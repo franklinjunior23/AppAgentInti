@@ -45,9 +45,9 @@ if (isDev) {
   )
 }
 
-const programDataPath = process.platform === 'win32' 
-? path.join(process.env['ProgramData'], 'agente-intisoft') 
-: app.getPath('appData');  // Para otros sistemas operativos
+const programDataPath = process.platform === 'win32'
+  ? path.join(process.env['ProgramData'], 'agente-intisoft')
+  : app.getPath('appData');  // Para otros sistemas operativos
 
 // Asegúrate de que el directorio exista, si no, créalo
 if (!fs.existsSync(programDataPath)) {
@@ -81,8 +81,7 @@ function createWindow() {
     mainWindow.show()
   })
 
-  // 10 segundos para traer la data
-
+  // La tarea se ejecutará cada 10 minutos
   cron.schedule('*/10 * * * * ', async () => {
     collectSystemInfo()
       .then((data) => {
@@ -102,7 +101,7 @@ function createWindow() {
 
   ipcMain.on('conect-user', async (event, data) => {
     try {
-     fs.writeFileSync(filePath, JSON.stringify(data))
+      fs.writeFileSync(filePath, JSON.stringify(data))
 
       collectSystemInfo()
         .then((data) => {
@@ -116,9 +115,9 @@ function createWindow() {
       console.log('Error al guardar el archivo:', error)
     }
   })
-  ipcMain.on('desvincule-device',  (event) => {
+  ipcMain.on('desvincule-device', (event) => {
     try {
-       fs.writeFileSync(
+      fs.writeFileSync(
         filePath,
         JSON.stringify({
           id_device: null
@@ -139,10 +138,14 @@ function createWindow() {
 
   ipcMain.on('refresh-data', async (event) => {
     console.log(api_url, data_device.id_device)
-    const param = await axios.patch(`${api_url}/device/${data_device.id_device}`, {
-      name: data_device.osInfo.hostname
-    })
-    console.log(param.data)
+    try {
+      const param = await axios.patch(`${api_url}/device/${data_device.id_device}`, {
+        name: data_device.osInfo.hostname
+      })
+      console.log(param.data)
+    } catch (error) {
+      console.log('Error al actualizar el dispositivo:', error)
+    }
   })
 
   mainWindow.webContents.on('did-finish-load', () => {
