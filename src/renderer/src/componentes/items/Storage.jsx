@@ -10,7 +10,7 @@ function Storage() {
       <CardHeader>
         <h2 className="text-2xl font-semibold ">Almacenamiento</h2>
       </CardHeader>
-      <CardContent  className="w-full">
+      <CardContent className="w-full">
         <span>Discos Duros cantidad : {datainformation.diskLayout.length}</span>
         <ul className="w-full grid grid-cols-3 gap-3">
           {datainformation.diskLayout.map((disk, index) => (

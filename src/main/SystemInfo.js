@@ -32,12 +32,13 @@ export async function collectSystemInfo() {
     //   time: '*',
     //   cpuTemperature: '*'
     // })
-    const programDataPath = process.platform === 'win32' 
-    ? path.join(process.env['ProgramData'], 'agente-intisoft') 
-    : app.getPath('appData');  // Para otros sistemas operativos
-    
+    const programDataPath =
+      process.platform === 'win32'
+        ? path.join(process.env['ProgramData'], 'agente-intisoft')
+        : app.getPath('appData') // Para otros sistemas operativos
+
     // Crear la ruta completa del archivo en ProgramData
-    const filePath = path.join(programDataPath, 'configUserConfig.json');
+    const filePath = path.join(programDataPath, 'configUserConfig.json')
 
     let device_id = null
     try {

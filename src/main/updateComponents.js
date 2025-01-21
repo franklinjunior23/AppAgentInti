@@ -1,3 +1,1 @@
-export function updateComponen(){
-    
-}
+export function updateComponen() {}

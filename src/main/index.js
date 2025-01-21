@@ -45,17 +45,18 @@ if (isDev) {
   )
 }
 
-const programDataPath = process.platform === 'win32'
-  ? path.join(process.env['ProgramData'], 'agente-intisoft')
-  : app.getPath('appData');  // Para otros sistemas operativos
+const programDataPath =
+  process.platform === 'win32'
+    ? path.join(process.env['ProgramData'], 'agente-intisoft')
+    : app.getPath('appData') // Para otros sistemas operativos
 
 // Asegúrate de que el directorio exista, si no, créalo
 if (!fs.existsSync(programDataPath)) {
-  fs.mkdirSync(programDataPath, { recursive: true });  // Crea los directorios de manera recursiva
+  fs.mkdirSync(programDataPath, { recursive: true }) // Crea los directorios de manera recursiva
 }
 
 // Crear la ruta completa del archivo en ProgramData
-const filePath = path.join(programDataPath, 'configUserConfig.json');
+const filePath = path.join(programDataPath, 'configUserConfig.json')
 
 console.log('Ruta del archivo:', filePath)
 function createWindow() {
