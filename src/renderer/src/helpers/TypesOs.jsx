@@ -1,11 +1,11 @@
 export function TypesOs({ platform, className }) {
   switch (platform) {
-    case 'windows' || 'win32' || 'win64' || 'win' || 'Windows' || 'Window':
+    case  'Windows':
       return <Windows className={className} />
     case 'linux' || 'Linux':
       return <Linux className={className} />
     default:
-      return <Windows className={className} />
+      return <Linux className={className} />
   }
 }
 

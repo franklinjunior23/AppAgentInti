@@ -1,6 +1,6 @@
 function SectionLayaout({ children, className }) {
   return (
-    <section className={`bg-black/60 mt-4 p-5 px-8 rounded-lg  ${className}`}>{children}</section>
+    <section className={`bg-black/60  p-5 px-8 rounded-lg  ${className}`}>{children}</section>
   )
 }
 

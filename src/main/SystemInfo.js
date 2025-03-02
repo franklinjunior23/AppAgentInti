@@ -1,48 +1,14 @@
 import si from 'systeminformation'
 import os from 'os'
-import path from 'path'
-import { app } from 'electron'
 import fs from 'fs'
+import { pathFileConfig } from './contants/name-config'
 
 export async function collectSystemInfo() {
   try {
-    // const alldata = await si.getAllData()
-    // const systemReport = await si.get({
-    //   system: '*',
-    //   osInfo: '*',
-    //   bios: '*',
-    //   baseboard: '*',
-    //   cpu: '*',
-    //   //  cpuCache: '*',
-    //   memLayout: '*', // Agregado para obtener información sobre la memoria RAM
-    //   memoryLayout: '*', // Agregado para obtener información detallada sobre la memoria RAM
-    //   graphics: '*',
-    //   blockDevices: '*',
-    //   battery: '*',
-    //   audio: '*',
-    //   networkInterfaces: '*',
-    //   // currentLoad: '*',
-    //   // processes: '*',
-    //   // services: '*',
-    //   virtualization: '*',
-    //   bluetooth: '*',
-    //   wifi: '*',
-    //   usb: '*',
-    //   users: '*',
-    //   time: '*',
-    //   cpuTemperature: '*'
-    // })
-    const programDataPath =
-      process.platform === 'win32'
-        ? path.join(process.env['ProgramData'], 'agente-intisoft')
-        : app.getPath('appData') // Para otros sistemas operativos
-
-    // Crear la ruta completa del archivo en ProgramData
-    const filePath = path.join(programDataPath, 'configUserConfig.json')
-
     let device_id = null
+    
     try {
-      const data = fs.readFileSync(filePath, 'utf8')
+      const data = fs.readFileSync(pathFileConfig, 'utf8')
 
       device_id = JSON.parse(data)?.id_device
     } catch (error) {
@@ -59,10 +25,13 @@ export async function collectSystemInfo() {
       users: '*', // Información de los usuarios
       graphics: '*', // Información de la tarjeta gráfica
       networkInterfaces: '*', // Información de las interfaces de red
-      uuid: '*', // UUID del sistema
       osInfo: '*' // Información del sistema operativo
     })
     const cpu = await si.cpu()
+
+    const sizeFs = await si.fsSize()
+
+    console.log(sizeFs)
 
     datasystem.cpu = cpu
     datasystem.id_device = device_id

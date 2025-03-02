@@ -13,7 +13,7 @@ import { DataNavbar } from '@/data/Navbar.data'
 
 function Header() {
   return (
-    <aside className="w-[70px] bg-white/60 dark:bg-black/80 ">
+    <aside className="w-[60px] bg-white/60 dark:bg-black/80 ">
       <header className=" h-screen  flex flex-col justify-between">
         <header className="flex gap-3 flex-col justify-between h-full">
           <section className="mt-5">
@@ -26,8 +26,8 @@ function Header() {
                   to={Url.path}
                   className={({ isActive }) => {
                     return isActive
-                      ? 'bg-black/[4%] dark:bg-black/50 py-3 cursor-pointer font-semibold hover:bg-slate-500/20 flex items-center gap-3 before:bg-ColorSystem before:mr-2 before:content-[attr(data-icon)] before:w-1 before:h-6 before:rounded-lg before:flex before:items-center before:justify-between  transition-colors duration-500 ease-in-out '
-                      : ' py-3  cursor-pointer hover:bg-black/[4%] dark:hover:bg-black/50 before:mr-2 before:content-[attr(data-icon)] before:w-1 hover:before:h-6 before:rounded-lg before:flex before:items-center before:justify-between before:bg-ColorSystem   flex items-center gap-3 transition-colors duration-500 ease-in-out  font-light'
+                      ? 'bg-black/[4%] dark:bg-black/50 py-2 cursor-pointer font-semibold hover:bg-slate-500/20 flex items-center gap-3 before:bg-ColorSystem before:content-[attr(data-icon)] before:w-1 before:h-6 before:rounded-lg before:flex before:items-center before:justify-between  transition-colors duration-500 ease-in-out '
+                      : ' py-2  cursor-pointer hover:bg-black/[4%] dark:hover:bg-black/50  before:content-[attr(data-icon)] before:w-1 hover:before:h-6 before:rounded-lg before:flex before:items-center before:justify-between before:bg-ColorSystem   flex items-center gap-3 transition-colors duration-500 ease-in-out  font-light'
                   }}
                   key={index}
                 >

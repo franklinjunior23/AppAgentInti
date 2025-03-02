@@ -1,14 +1,4 @@
-import {
-  app,
-  shell,
-  BrowserWindow,
-  ipcMain,
-  Tray,
-  Menu,
-  dialog,
-  Notification,
-  session
-} from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -19,25 +9,34 @@ import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
 import cron from 'node-cron'
+import { API_URL, isDevelopment } from './contants/is-dev'
+import { directoryApplication, pathFileConfig } from './contants/name-config'
+import { validateDirectory } from './helper/validate-directory'
+import { createTray } from './config/tray-menu'
+import { getDataDevice } from './crons/get-data-device'
 
-let tray = null
+let mainWindow
+let dataDevice
+
 let data_device = null
 let deviceDataNew = null
-let api_url = 'https://dev.intisoft.com.pe/api/v1'
 
-app.relaunch = true
+const notifyFrontendReply = 'errorSystem'
+
+const gotTheLock = app.requestSingleInstanceLock()
+
+// DESACTIVAR LA ACELERACIÓN DE HARDWARE
+app.disableHardwareAcceleration()
 
 // CONFIGURACON PARA AUTO UPDATE
 
-Object.defineProperty(app, 'isPackaged', {
-  get() {
-    return true
-  }
-})
-app.disableHardwareAcceleration()
-const isDev = process.env.NODE_ENV === 'development'
-if (isDev) {
-  api_url = 'http://localhost:3000/api/v1'
+// Object.defineProperty(app, 'isPackaged', {
+//   get() {
+//     return true
+//   }
+// })
+
+if (isDevelopment) {
   process.env.APPIMAGE = path.join(
     __dirname,
     'dist',
@@ -45,31 +44,17 @@ if (isDev) {
   )
 }
 
-const programDataPath =
-  process.platform === 'win32'
-    ? path.join(process.env['ProgramData'], 'agente-intisoft')
-    : app.getPath('appData') // Para otros sistemas operativos
+validateDirectory(directoryApplication)
 
-// Asegúrate de que el directorio exista, si no, créalo
-if (!fs.existsSync(programDataPath)) {
-  fs.mkdirSync(programDataPath, { recursive: true }) // Crea los directorios de manera recursiva
-}
-
-// Crear la ruta completa del archivo en ProgramData
-const filePath = path.join(programDataPath, 'configUserConfig.json')
-
-console.log('Ruta del archivo:', filePath)
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 500,
     show: false,
     resizable: false,
     center: true,
     autoHideMenuBar: true,
-    vibrancy: 'under-window',
-    visualEffectState: 'active',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       nodeIntegration: true,
@@ -82,18 +67,7 @@ function createWindow() {
     mainWindow.show()
   })
 
-  // La tarea se ejecutará cada 10 minutos
-  cron.schedule('*/10 * * * * ', async () => {
-    collectSystemInfo()
-      .then((data) => {
-        data_device = data
-        console.log('enviando')
-        mainWindow.webContents.send('SystemInfo', data)
-      })
-      .catch((error) => {
-        console.error('Error al recopilar información del sistema:', error)
-      })
-  })
+  getDataDevice(mainWindow)
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -102,50 +76,117 @@ function createWindow() {
 
   ipcMain.on('conect-user', async (event, data) => {
     try {
-      fs.writeFileSync(filePath, JSON.stringify(data))
+      // Validar si los datos contienen un ID de dispositivo válido
+      if (!data?.id_device) {
+        return event.reply(notifyFrontendReply, {
+          success: false,
+          title: '⚠️ Error de conexión',
+          message: 'El ID del dispositivo es inválido o no está presente.'
+        })
+      }
 
-      collectSystemInfo()
-        .then((data) => {
-          data_device = data
-          mainWindow.webContents.send('SystemInfo', data)
+      // Guardar los datos en el archivo
+      fs.writeFileSync(pathFileConfig, JSON.stringify(data))
+
+      try {
+        // Recopilar información del sistema nuevamente
+        const systemData = await collectSystemInfo()
+        data_device = systemData
+
+        // Enviar la nueva información al frontend
+        mainWindow.webContents.send('SystemInfo', systemData)
+
+        // Responder con éxito al frontend
+        event.reply(notifyFrontendReply, {
+          success: true,
+          title: '✅ Usuario conectado',
+          message: 'El usuario ha sido conectado correctamente.'
         })
-        .catch((error) => {
-          console.error('Error al recopilar la información inicial del sistema:', error)
+      } catch (error) {
+        console.error('Error al recopilar la información inicial del sistema:', error)
+        event.reply(notifyFrontendReply, {
+          success: false,
+          title: '❌ Error al conectar',
+          message: 'No se pudo recopilar la información del sistema.'
         })
+      }
     } catch (error) {
-      console.log('Error al guardar el archivo:', error)
+      console.error('Error al guardar el archivo:', error)
+      event.reply(notifyFrontendReply, {
+        success: false,
+        title: '❌ Error al guardar',
+        message: 'No se pudo guardar la información del usuario.'
+      })
     }
   })
-  ipcMain.on('desvincule-device', (event) => {
+
+  ipcMain.on('desvincule-device', async (event) => {
     try {
-      fs.writeFileSync(
-        filePath,
-        JSON.stringify({
-          id_device: null
+      let fileData = {}
+      if (fs.existsSync(filePath)) {
+        const rawData = fs.readFileSync(filePath, 'utf-8')
+        fileData = rawData ? JSON.parse(rawData) : {}
+      }
+
+      if (!fileData.id_device) {
+        return event.reply(notifyFrontendReply, {
+          success: false,
+          title: '⚠️ Dispositivo no vinculado',
+          message: 'El dispositivo ya está desvinculado o no tiene un ID registrado.'
         })
-      )
-      collectSystemInfo()
-        .then((data) => {
-          data_device = data
-          mainWindow.webContents.send('SystemInfo', data)
-        })
-        .catch((error) => {
-          console.error('Error al recopilar la información inicial del sistema:', error)
-        })
+      }
+
+      fs.writeFileSync(filePath, JSON.stringify({ id_device: null }))
+
+      const data = await collectSystemInfo()
+      data_device = data
+
+      mainWindow.webContents.send('SystemInfo', data)
+
+      // Responder con éxito al frontend
+      event.reply(notifyFrontendReply, {
+        success: true,
+        title: '✅ Dispositivo desvinculado',
+        message: 'El dispositivo se ha desvinculado correctamente.'
+      })
     } catch (error) {
-      console.log('Error al desvincular el dispositivo:', error)
+      console.error('Error al desvincular el dispositivo:', error)
+
+      // Responder con error al frontend
+      event.reply(notifyFrontendReply, {
+        success: false,
+        title: '❌ Error al desvincular',
+        message: error?.message ?? 'Ocurrió un error inesperado al desvincular el dispositivo.'
+      })
     }
   })
 
   ipcMain.on('refresh-data', async (event) => {
     console.log(api_url, data_device.id_device)
     try {
-      const param = await axios.patch(`${api_url}/device/${data_device.id_device}`, {
+      const { data } = await axios.patch(`${API_URL}/device/${data_device.id_device}`, {
         name: data_device.osInfo.hostname
       })
-      console.log(param.data)
+      event.reply(notifyFrontendReply, {
+        success: true,
+        title: '✅ Dispositivo actualizado',
+        message: data?.message ?? 'El dispositivo se ha actualizado correctamente.'
+      })
     } catch (error) {
-      console.log('Error al actualizar el dispositivo:', error)
+      event.reply(notifyFrontendReply, {
+        success: false,
+        title: 'Error en la actualización del dispositivo',
+        message: `
+          ❌ Error en la actualización del dispositivo ❌
+          -----------------------------------------------
+          🛑 Mensaje: ${error?.message || 'No disponible'}
+          🛑 Respuesta del servidor: ${error?.response?.data?.message || 'No disponible'}
+          🛑 Tipo de error: ${error?.response?.data?.error || 'No disponible'}
+          
+          🌍 URL: ${API_URL}/device/${data_device.id_device}
+          🔍 ID del dispositivo: ${data_device.id_device}
+        `.trim()
+      })
     }
   })
 
@@ -161,12 +202,12 @@ function createWindow() {
 
     cron.schedule('*/10 * * * *', async () => {
       try {
-        const filedata = fs.readFileSync(filePath, 'utf-8')
+        const filedata = fs.readFileSync(pathFileConfig, 'utf-8')
         const data = JSON.parse(filedata)
 
         if (!data.device_id) return
 
-        console.log('si existr')
+        console.log('si existe')
       } catch (error) {
         console.log('No existe el archivo')
       }
@@ -181,52 +222,7 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  tray = new Tray(icon)
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: 'Abrir Aplicacion',
-      type: 'normal',
-      click: () => {
-        mainWindow.show()
-      }
-    },
-    {
-      label: 'Ocultar Aplicacion',
-      type: 'normal',
-      click: () => {
-        mainWindow.hide()
-      }
-    },
-    {
-      label: 'Recargar Aplicacion',
-      type: 'normal',
-      click: () => {
-        mainWindow.reload()
-      }
-    },
-    {
-      label: 'AutoInicio',
-      type: 'checkbox',
-      checked: app.getLoginItemSettings().openAtLogin,
-      click: () => {
-        const settings = app.getLoginItemSettings()
-        app.setLoginItemSettings({
-          openAtLogin: !settings.openAtLogin,
-          path: app.getPath('exe')
-        })
-      }
-    },
-    {
-      label: 'Cerrar Aplicacion',
-      type: 'normal',
-      click: () => {
-        app.isQuitting = true // Marcar que la aplicación está cerrando
-        app.quit()
-      }
-    }
-  ])
-  tray.setToolTip('AgentInventory')
-  tray.setContextMenu(contextMenu)
+  createTray(mainWindow, icon)
 
   mainWindow.on('close', (event) => {
     if (!app.isQuitting) {
@@ -250,6 +246,18 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 app.whenReady().then(() => {
   // Iniciar la aplicación en segundo plano
   createWindow()
+
+  // if (!gotTheLock) {
+  //   app.quit();
+  // } else {
+  //   app.on('second-instance', () => {
+  //     if (mainWindow) {
+  //       if (mainWindow.isMinimized()) mainWindow.restore();
+  //       mainWindow.show();
+  //       mainWindow.focus();
+  //     }
+  //   });
+  // }
   // session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
   //   // Agrega la cabecera 'Origin' para las solicitudes salientes
   //   details.requestHeaders['Origin'] = 'http://localhost:3005'

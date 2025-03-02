@@ -54,7 +54,7 @@ function Setting() {
       motherboard: {
         brand: datainformation.baseboard.manufacturer ?? 'No disponible',
         model: datainformation.baseboard.model ?? 'No disponible',
-        quantitySlots: datainformation.baseboard.memMax ?? 0
+        quantitySlots: datainformation.baseboard.memSlots ?? 0
       },
       cpu: {
         brand: CpuBrand(datainformation.cpu.brand),
@@ -116,6 +116,8 @@ function Setting() {
     // Lógica para borrar la vinculación
     alert('La vinculación ha sido eliminada.')
     window.systemAPI.removeIdDevice()
+
+    localStorage.removeItem('id_device')
   }
 
   useEffect(() => {

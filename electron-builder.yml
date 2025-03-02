@@ -18,6 +18,7 @@ nsis:
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
   perMachine: true
+  allowElevation: true
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea'
 function Support() {
   return (
     <>
-      <main className="p-5">
+      <main className="">
         <h1 className="font-semibold text-2xl my-3 ">Soporte Ticket</h1>
         <section className="grid">
           <label>Mencionar Titulo de su Problema</label>

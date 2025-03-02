@@ -13,28 +13,31 @@ import PageAplications from './screen/Aplications'
 import History from './screen/History'
 import { ThemeProvider } from './provider/Theme'
 import Layaout from './layaout/default'
+import ErrorProvider from './provider/ErrorsProvider'
 
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <ProvideSystemData>
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
-            <Route element={<Layaout />}>
-              <Route path="/" index element={<Home />} />
-              <Route path="/aplications" element={<PageAplications />} />
-              <Route path="/Setting" element={<Setting />} />
-              <Route path="/history" element={<History />} />
-              <Route path="/Support" element={<Support />} />
-              <Route path="/help" element={<>Reportes</>} />
-            </Route>
-          </Routes>
-        </Router>
+  <ErrorProvider>
+    <ProvideSystemData>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <Routes>
+              <Route element={<Layaout />}>
+                <Route path="/" index element={<Home />} />
+                <Route path="/aplications" element={<PageAplications />} />
+                <Route path="/Setting" element={<Setting />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/Support" element={<Support />} />
+                <Route path="/help" element={<>Reportes</>} />
+              </Route>
+            </Routes>
+          </Router>
 
-        <ToastContainer position="bottom-right" theme="dark" />
-      </QueryClientProvider>
-    </ThemeProvider>
-  </ProvideSystemData>
+          <ToastContainer position="bottom-right" theme="dark" />
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ProvideSystemData>
+  </ErrorProvider>
 )
