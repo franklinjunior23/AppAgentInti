@@ -1,5 +1,5 @@
 {
-  "name": "agentinventoy",
+  "name": "agentinventory",
   "version": "1.2.0-alpha.1",
   "description": "Agent aplication this intisoft",
   "main": "./out/main/index.js",
@@ -32,7 +32,7 @@
     "@tabler/icons-react": "^2.39.0",
     "auto-launch": "^5.0.6",
     "axios": "^1.5.1",
-    "better-sqlite3": "^11.3.0",
+    "better-sqlite3": "^11.8.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "electron-updater": "^6.1.7",
@@ -45,6 +45,7 @@
     "react-query": "^3.39.3",
     "react-router-dom": "^6.17.0",
     "react-toastify": "^9.1.3",
+    "sqlite3": "^5.1.7",
     "systeminformation": "^5.25.11",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",

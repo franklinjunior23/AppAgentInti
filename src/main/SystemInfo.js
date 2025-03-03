@@ -1,16 +1,18 @@
 import si from 'systeminformation'
 import os from 'os'
-import fs from 'fs'
-import { pathFileConfig } from './contants/name-config'
+import Config from './helper/get-config'
 
 export async function collectSystemInfo() {
   try {
-    let device_id = null
-    
-    try {
-      const data = fs.readFileSync(pathFileConfig, 'utf8')
 
-      device_id = JSON.parse(data)?.id_device
+    let deviceId = null
+
+    try {
+
+      const config = new Config()
+      deviceId = config.get().id_device
+      
+      console.error('Archivo de configuracion leido correctamente : collectSystemInfo')
     } catch (error) {
       console.log(error.message)
       console.error('Error al leer el archivo de configuración:')
@@ -25,7 +27,8 @@ export async function collectSystemInfo() {
       users: '*', // Información de los usuarios
       graphics: '*', // Información de la tarjeta gráfica
       networkInterfaces: '*', // Información de las interfaces de red
-      osInfo: '*' // Información del sistema operativo
+      osInfo: '*', // Información del sistema operativo
+      uuid:'*'
     })
     const cpu = await si.cpu()
 
@@ -34,7 +37,7 @@ export async function collectSystemInfo() {
     console.log(sizeFs)
 
     datasystem.cpu = cpu
-    datasystem.id_device = device_id
+    datasystem.id_device = deviceId
     datasystem.currentUser = os.userInfo().username
 
     return datasystem

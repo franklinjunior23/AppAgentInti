@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { NameFunction } from '../main/types'
+import { GET_NOTIFICATION } from '../main/contants/name-notifitacion'
 
 // Custom APIs for renderer
 const api = {
@@ -8,10 +9,6 @@ const api = {
     return await ipcRenderer.invoke(NameFunction.SystemOs)
   }
 }
-
-ipcRenderer.on('pong', (event, message) => {
-  console.log(message)
-})
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -36,15 +33,29 @@ contextBridge.exposeInMainWorld('systemAPI', {
   sendSignDevice: (data) => ipcRenderer.send('conect-user', data),
   refreshData: () => ipcRenderer.send('refresh-data'),
   removeIdDevice: () => ipcRenderer.send('desvincule-device'),
-  onErrorSystem : (callback) => ipcRenderer.on('errorSystem', (event, data) => callback(data)),
+  onErrorSystem: (callback) => ipcRenderer.on('errorSystem', (event, data) => callback(data)),
 
+  // NOTIFICATION
+  getNotifications: (params) => ipcRenderer.send('get-notifications', params),
+  onNotificationsReply: (callback) =>
+    ipcRenderer.on('get-notifications-reply', (event, response) => callback(response)),
+
+  // Para recibir notificaciones en tiempo real
+  onNewNotification: (callback) =>
+    ipcRenderer.on('new-notification', (event, notification) => callback(notification)),
+
+
+  
   // Limpiar los listeners cuando ya no sean necesarios
   removeSystemInfoListener: () => {
     ipcRenderer.removeAllListeners('SystemInfo')
-  }
-,
+  },
   removeErrorSystemListener: () => {
     ipcRenderer.removeAllListeners('errorSystem')
+  },
+  removeListenersNotifications: () => {
+    ipcRenderer.removeAllListeners('get-notifications-reply')
+    ipcRenderer.removeAllListeners('new-notification')
   }
 })
 

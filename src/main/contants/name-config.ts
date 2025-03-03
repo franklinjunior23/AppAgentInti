@@ -7,3 +7,5 @@ export const directoryApplication =
     : app.getPath('appData')
 
 export const pathFileConfig = path.join(directoryApplication, 'configUserConfig.json')
+
+export const pathFileDbConfig = path.join(directoryApplication, 'database_device.db')

@@ -1,3 +1,4 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './assets/index.css'
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
@@ -14,30 +15,33 @@ import History from './screen/History'
 import { ThemeProvider } from './provider/Theme'
 import Layaout from './layaout/default'
 import ErrorProvider from './provider/ErrorsProvider'
+import NotificationProver from './provider/notification-provider'
 
 const queryClient = new QueryClient()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ErrorProvider>
-    <ProvideSystemData>
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <Router>
-            <Routes>
-              <Route element={<Layaout />}>
-                <Route path="/" index element={<Home />} />
-                <Route path="/aplications" element={<PageAplications />} />
-                <Route path="/Setting" element={<Setting />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/Support" element={<Support />} />
-                <Route path="/help" element={<>Reportes</>} />
-              </Route>
-            </Routes>
-          </Router>
+    <NotificationProver>
+      <ProvideSystemData>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <Router>
+              <Routes>
+                <Route element={<Layaout />}>
+                  <Route path="/" index element={<Home />} />
+                  <Route path="/aplications" element={<PageAplications />} />
+                  <Route path="/Setting" element={<Setting />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/Support" element={<Support />} />
+                  <Route path="/help" element={<>Reportes</>} />
+                </Route>
+              </Routes>
+            </Router>
 
-          <ToastContainer position="bottom-right" theme="dark" />
-        </QueryClientProvider>
-      </ThemeProvider>
-    </ProvideSystemData>
+            <ToastContainer position="bottom-right" theme="dark" />
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ProvideSystemData>
+    </NotificationProver>
   </ErrorProvider>
 )

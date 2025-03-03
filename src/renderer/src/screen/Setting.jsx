@@ -28,7 +28,7 @@ function Setting() {
     const { data: DataApi } = await AxiosRest.post('/device', {
       isRegisterAgent: true,
       name: datainformation.osInfo.hostname,
-      status: 'Activo',
+      status: 'En buen estado',
       nickName: '',
       branchId: DataToken,
       information: {
@@ -37,8 +37,8 @@ function Setting() {
           isVerifiyDevice(datainformation.battery.hasBattery) === 'Pc' ? 'Compatible' : 'Netboock',
         serialNumber: datainformation.uuid.os,
         typeConection: '',
-        brand: '',
-        model: ''
+        brand: 'Compatible',
+        model: 'Compatible'
       },
       os: {
         platform: datainformation.osInfo.platform ?? 'No disponible',
