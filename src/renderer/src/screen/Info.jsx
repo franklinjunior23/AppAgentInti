@@ -1,10 +1,25 @@
+import React, { useEffect, useState } from 'react'
 import Header from '../componentes/Header'
 
 function Info() {
+  const [appVersion, setAppVersion] = useState('')
+  const [updateAvailable, setUpdateAvailable] = useState(false)
+
+  useEffect(() => {
+    window.systemAPI.onUpdateAvailable(() => {
+      setUpdateAvailable(true)
+    })
+  }, [])
+
+  useEffect(() => {
+    window.systemAPI.getAppVersion().then(setAppVersion)
+  }, [])
   return (
     <>
-      <main className=" p-6">
-        <h1 className="font-semibold text-2xl my-3">Agente IntisCorp</h1>
+      <main className="">
+        <h2>Version : {appVersion ?? 'No hay version'}</h2>
+        {updateAvailable ? <div>¡Nueva actualización disponible!</div> : null}
+        <h1 className="font-semibold text-2xl  mb-2">Agente IntisCorp</h1>
         <p className="text-pretty text-sm">
           Bienvenido al servicio de asistencia del Agente IntisCorp. Estamos aquí para ayudarte en
           todo lo que necesites. Si tienes alguna pregunta, inquietud o problema, no dudes en
@@ -12,7 +27,6 @@ function Info() {
           del día, los 7 días de la semana, para proporcionarte la mejor asistencia posible. Puedes
           comunicarte con nosotros a través de los siguientes canales:
         </p>
-
         <ul className="list-disc pl-5 my-4">
           <li>Teléfono: +51 946078316</li>
           <li>Correo electrónico: contacto@intiscorp.com.pe</li>

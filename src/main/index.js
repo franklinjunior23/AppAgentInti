@@ -14,15 +14,17 @@ import { createTray } from './config/tray-menu'
 import { getDataDevice } from './crons/get-data-device'
 import { Initialiti } from './database/initialiti'
 import setupIpcHandlers from './config/handlers/ipc-setup'
+import { autoUpdater } from 'electron-updater'
 
 let mainWindow
-let dataConfiguration
-
 let data_device = null
 
 const notifyFrontendReply = 'errorSystem'
 
 const gotTheLock = app.requestSingleInstanceLock()
+
+
+
 
 // DESACTIVAR LA ACELERACIÓN DE HARDWARE
 app.disableHardwareAcceleration()
@@ -37,6 +39,8 @@ if (isDevelopment) {
 }
 
 validateDirectory(directoryApplication)
+
+ipcMain.handle('get-app-version', () => app.getVersion())
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -136,6 +140,17 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 
 app.whenReady().then(() => {
   createWindow()
+
+  autoUpdater.checkForUpdatesAndNotify() // Check for updates
+
+  autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update_available')
+  })
+
+  autoUpdater.on('update-downloaded', () => {
+    mainWindow.webContents.send('update_downloaded')
+  })
+
 
   if (!isDevelopment) {
     appLauncher.isEnabled().then((isEnabled) => {

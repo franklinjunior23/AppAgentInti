@@ -17,8 +17,10 @@ nsis:
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
-  perMachine: true
+  perMachine: false
   allowElevation: true
+  oneClick: false
+  menuCategory: true 
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:

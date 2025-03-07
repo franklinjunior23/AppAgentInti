@@ -1,6 +1,6 @@
 {
   "name": "agentinventory",
-  "version": "1.2.0-alpha.1",
+  "version": "1.1.0",
   "description": "Agent aplication this intisoft",
   "main": "./out/main/index.js",
   "author": "intisoft.com.pe",

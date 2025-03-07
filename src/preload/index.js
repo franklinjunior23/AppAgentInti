@@ -1,7 +1,6 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { app, contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { NameFunction } from '../main/types'
-import { GET_NOTIFICATION } from '../main/contants/name-notifitacion'
 
 // Custom APIs for renderer
 const api = {
@@ -17,6 +16,11 @@ const api = {
 //funcion para mandar al front la data que se recepciona en ello
 
 contextBridge.exposeInMainWorld('systemAPI', {
+
+  onUpdateAvailable: (callback) => ipcRenderer.on('update_available', callback),
+  onUpdateDownloaded: (callback) => ipcRenderer.on('update_downloaded', callback),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+
   getInfo: () => {
     return new Promise((resolve) => {
       // Escuchar el evento 'system-info' enviado desde el proceso principal
@@ -44,8 +48,6 @@ contextBridge.exposeInMainWorld('systemAPI', {
   onNewNotification: (callback) =>
     ipcRenderer.on('new-notification', (event, notification) => callback(notification)),
 
-
-  
   // Limpiar los listeners cuando ya no sean necesarios
   removeSystemInfoListener: () => {
     ipcRenderer.removeAllListeners('SystemInfo')

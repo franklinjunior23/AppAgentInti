@@ -3,6 +3,5 @@ updaterCacheDirName: agentinventoy-updater
 owner: franklinjunior23
 repo: AppAgentInti
 releaseType: release
-host: 'https://github.com'
-private: true
-token: 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
+private: false
+vPrefixedTag: true
