@@ -15,6 +15,13 @@ import { getDataDevice } from './crons/get-data-device'
 import { Initialiti } from './database/initialiti'
 import setupIpcHandlers from './config/handlers/ipc-setup'
 import { autoUpdater } from 'electron-updater'
+import log from 'electron-log'
+
+autoUpdater.logger = log
+
+log.transports.file.resolvePath = () => join(directoryApplication,'./log.txt')
+autoUpdater.logger.transports.file.level = 'info' // Asegura que autoUpdater loguea
+
 
 let mainWindow
 let data_device = null
@@ -23,7 +30,8 @@ const notifyFrontendReply = 'errorSystem'
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-
+autoUpdater.logger = log
+log.info('App iniciando...')
 
 
 // DESACTIVAR LA ACELERACIÓN DE HARDWARE
@@ -140,15 +148,31 @@ ipcMain.handle(NameFunction.SystemOs, async () => {
 
 app.whenReady().then(() => {
   createWindow()
-
+  
+  autoUpdater.forceDevUpdateConfig = true
   autoUpdater.checkForUpdatesAndNotify() // Check for updates
 
-  autoUpdater.on('update-available', () => {
+  autoUpdater.on('update-available', (info) => {
     mainWindow.webContents.send('update_available')
+    log.info('✅ Actualización disponible:', info)
   })
 
   autoUpdater.on('update-downloaded', () => {
     mainWindow.webContents.send('update_downloaded')
+    log.info('📦 Actualización descargada. Reiniciando...')
+    autoUpdater.quitAndInstall()
+  })
+
+  autoUpdater.on('checking-for-update', () => {
+    log.info('Buscando actualizaciones...')
+  })
+
+  autoUpdater.on('update-not-available', () => {
+    log.info('🚀 No hay nuevas actualizaciones.')
+  })
+
+  autoUpdater.on('error', (err) => {
+    log.error('❌ Error en autoUpdater:', err)
   })
 
 
