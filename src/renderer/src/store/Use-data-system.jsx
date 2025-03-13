@@ -8,6 +8,11 @@ export const useDataSystem = () => {
 
 export const ProvideSystemData = ({ children }) => {
   const [datainformation, setdatainformation] = useState(null)
+  const [UpdateAvailableInfo, setUpdateAvailableInfo] = useState({})
+  const [cpu, setCpu] = useState('0')
+  const [ram, setRam] = useState('0')
+  const [disks, setDisks] = useState([])
+
   const [dataCompany, setdataCompany] = useState(() => {
     return JSON.parse(localStorage.getItem('Data_Empresa')) ?? null
   })
@@ -17,6 +22,16 @@ export const ProvideSystemData = ({ children }) => {
   const [IdDevice, setIdDevice] = useState(() => {
     return localStorage.getItem('IdDispositivo') ?? null
   })
+
+  useEffect(() => {
+    window.systemAPI.onUpdateAvailable((data) => {
+      setUpdateAvailableInfo(data)
+    })
+
+    return () => {
+      window.systemAPI.removeListenerUpdateAvailable()
+    }
+  }, [])
 
   useEffect(() => {
     window.electron.ipcRenderer.on('message', (event, message) => {
@@ -58,13 +73,30 @@ export const ProvideSystemData = ({ children }) => {
     }
   }, [dataCompany, tokenBranch, IdDevice])
 
+  useEffect(() => {
+    const updateStats = ({ cpuUsage, ramUsage, diskUsage }) => {
+      setCpu(cpuUsage)
+      setRam(ramUsage)
+      setDisks(diskUsage)
+    }
+
+    window.systemAPI.onSystemStats(updateStats) // 📡 Escuchar el evento
+
+    return () => {
+      window.systemAPI.removeSystemStats(updateStats) // 🧹 Limpiar el evento al desmontar
+    }
+  }, [])
   return (
     <Contextdatadevice.Provider
       value={{
         datainformation,
         dataCompany,
         tokenBranch,
-        IdDevice
+        IdDevice,
+        UpdateAvailableInfo,
+        cpu,
+        ram,
+        disks
       }}
     >
       {children}

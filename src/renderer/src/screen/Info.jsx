@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import Header from '../componentes/Header'
+import { useDataSystem } from '@/store/Use-data-system'
+import { Button } from '@/components/ui/button'
 
 function Info() {
   const [appVersion, setAppVersion] = useState('')
-  const [updateAvailable, setUpdateAvailable] = useState(false)
 
-  useEffect(() => {
-    window.systemAPI.onUpdateAvailable(() => {
-      setUpdateAvailable(true)
-    })
-  }, [])
+  const { UpdateAvailableInfo } = useDataSystem()
 
   useEffect(() => {
     window.systemAPI.getAppVersion().then(setAppVersion)
@@ -18,7 +14,18 @@ function Info() {
     <>
       <main className="">
         <h2>Version : {appVersion ?? 'No hay version'}</h2>
-        {updateAvailable ? <div>¡Nueva actualización disponible!</div> : null}
+
+        {UpdateAvailableInfo?.version && (
+          <h2>Hay una nueva versión disponible: {UpdateAvailableInfo.version}</h2>
+        )}
+
+        {
+          UpdateAvailableInfo?.version && (
+            <Button onClick={() => window.systemAPI.startDownload()}>
+              Descargar actualizacion
+            </Button>
+          )
+        }
         <h1 className="font-semibold text-2xl  mb-2">Agente IntisCorp</h1>
         <p className="text-pretty text-sm">
           Bienvenido al servicio de asistencia del Agente IntisCorp. Estamos aquí para ayudarte en

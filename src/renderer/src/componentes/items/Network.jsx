@@ -1,3 +1,4 @@
+import React from 'react'
 import { useDataSystem } from '@/store/Use-data-system'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { LabelItem } from './SectionLayaout'
@@ -11,8 +12,8 @@ function Network() {
         <h2 className="text-2xl font-semibold ">Red</h2>
       </CardHeader>
       <CardContent className="grid grid-cols-3 gap-4">
-        {datainformation.networkInterfaces.map((networkInterface) => (
-          <div key={networkInterface.mac} className="my-2  bg-neutral-600/40 rounded-xl p-4">
+        {datainformation.networkInterfaces.map((networkInterface,index) => (
+          <div key={index} className="my-2  bg-neutral-600/40 rounded-xl p-4">
             <LabelItem label={'Nombre'} dataLabel={networkInterface.iface} />
             <LabelItem label={'IP4'} dataLabel={networkInterface.ip4} />
             <LabelItem label={'IP6'} dataLabel={networkInterface.ip6} />

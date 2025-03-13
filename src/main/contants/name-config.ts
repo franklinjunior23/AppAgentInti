@@ -9,3 +9,5 @@ export const directoryApplication =
 export const pathFileConfig = path.join(directoryApplication, 'configUserConfig.json')
 
 export const pathFileDbConfig = path.join(directoryApplication, 'database_device.db')
+
+export const pathFileDbDevice = path.join(directoryApplication, 'device-data.json')

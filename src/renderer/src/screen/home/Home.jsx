@@ -12,6 +12,7 @@ import Motherboard from '@/componentes/items/Motherboard'
 import SectionLayaout from '@/componentes/items/SectionLayaout'
 import { Separator } from '@/components/ui/separator'
 import UserView from '@/componentes/(vinculed)/user'
+import StateUsage from '@/componentes/items/state-use'
 
 export default function Home() {
   const { datainformation } = useDataSystem()
@@ -33,12 +34,10 @@ export default function Home() {
 
         <section className="">
           <div className="grid grid-cols-2 my-4 gap-5">
-            <div>
+            <StateUsage />
+            <div className="flex flex-col gap-5">
               <Motherboard />
               <Processor />
-            </div>
-            <div>
-              <UserView />
             </div>
           </div>
           <main className="grid grid-cols-2 gap-4">
@@ -59,4 +58,3 @@ export default function Home() {
     </>
   )
 }
-

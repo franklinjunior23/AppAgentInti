@@ -1,42 +1,30 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { collectSystemInfo } from './SystemInfo'
 import AutoLaunch from 'auto-launch'
-import { NameFunction } from './types'
-import axios from 'axios'
 import path from 'path'
-import { API_URL, isDevelopment } from './contants/is-dev'
+import { isDevelopment } from './contants/is-dev'
 import { directoryApplication } from './contants/name-config'
 import { validateDirectory } from './helper/validate-directory'
 import { createTray } from './config/tray-menu'
 import { getDataDevice } from './crons/get-data-device'
-import { Initialiti } from './database/initialiti'
 import setupIpcHandlers from './config/handlers/ipc-setup'
-import { autoUpdater } from 'electron-updater'
-import log from 'electron-log'
+import { Updater } from './config/auto-update'
+import { checkAndInsertHistory } from './database/query/history-query'
+import CpuMemoryUsage from './domain/cpu-memory-usage'
 
-autoUpdater.logger = log
-
-log.transports.file.resolvePath = () => join(directoryApplication,'./log.txt')
-autoUpdater.logger.transports.file.level = 'info' // Asegura que autoUpdater loguea
-
+validateDirectory(directoryApplication)
+checkAndInsertHistory()
 
 let mainWindow
 let data_device = null
 
 const notifyFrontendReply = 'errorSystem'
-
 const gotTheLock = app.requestSingleInstanceLock()
 
-autoUpdater.logger = log
-log.info('App iniciando...')
-
-
-// DESACTIVAR LA ACELERACIÓN DE HARDWARE
 app.disableHardwareAcceleration()
-Initialiti()
 
 if (isDevelopment) {
   process.env.APPIMAGE = path.join(
@@ -46,9 +34,7 @@ if (isDevelopment) {
   )
 }
 
-validateDirectory(directoryApplication)
 
-ipcMain.handle('get-app-version', () => app.getVersion())
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -66,6 +52,8 @@ function createWindow() {
     }
   })
 
+  CpuMemoryUsage()
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
@@ -77,37 +65,37 @@ function createWindow() {
     return { action: 'deny' }
   })
 
-  ipcMain.on('refresh-data', async (event) => {
-    console.log(api_url, data_device.id_device)
-    try {
-      const { data } = await axios.patch(`${API_URL}/device/${data_device.id_device}`, {
-        name: data_device.osInfo.hostname
-      })
-      event.reply(notifyFrontendReply, {
-        success: true,
-        title: '✅ Dispositivo actualizado',
-        message: data?.message ?? 'El dispositivo se ha actualizado correctamente.'
-      })
-    } catch (error) {
-      event.reply(notifyFrontendReply, {
-        success: false,
-        title: 'Error en la actualización del dispositivo',
-        message: `
-          ❌ Error en la actualización del dispositivo ❌
-          -----------------------------------------------
-          🛑 Mensaje: ${error?.message || 'No disponible'}
-          🛑 Respuesta del servidor: ${error?.response?.data?.message || 'No disponible'}
-          🛑 Tipo de error: ${error?.response?.data?.error || 'No disponible'}
-          
-          🌍 URL: ${API_URL}/device/${data_device.id_device}
-          🔍 ID del dispositivo: ${data_device.id_device}
-        `.trim()
-      })
-    }
-  })
+  // ipcMain.on('refresh-data', async (event) => {
+  //   console.log(api_url, data_device.id_device)
+  //   try {
+  //     const { data } = await axios.patch(`${API_URL}/device/${data_device.id_device}`, {
+  //       name: data_device.osInfo.hostname
+  //     })
+  //     event.reply(notifyFrontendReply, {
+  //       success: true,
+  //       title: '✅ Dispositivo actualizado',
+  //       message: data?.message ?? 'El dispositivo se ha actualizado correctamente.'
+  //     })
+  //   } catch (error) {
+  //     event.reply(notifyFrontendReply, {
+  //       success: false,
+  //       title: 'Error en la actualización del dispositivo',
+  //       message: `
+  //         ❌ Error en la actualización del dispositivo ❌
+  //         -----------------------------------------------
+  //         🛑 Mensaje: ${error?.message || 'No disponible'}
+  //         🛑 Respuesta del servidor: ${error?.response?.data?.message || 'No disponible'}
+  //         🛑 Tipo de error: ${error?.response?.data?.error || 'No disponible'}
+
+  //         🌍 URL: ${API_URL}/device/${data_device.id_device}
+  //         🔍 ID del dispositivo: ${data_device.id_device}
+  //       `.trim()
+  //     })
+  //   }
+  // })
 
   mainWindow.webContents.on('did-finish-load', () => {
-    collectSystemInfo()
+    collectSystemInfo(mainWindow)
       .then((data) => {
         data_device = data
         mainWindow.webContents.send('SystemInfo', data)
@@ -134,47 +122,24 @@ function createWindow() {
     }
   })
 }
-// Configuración de autoinicio (AutoLaunch)
+
 const appLauncher = new AutoLaunch({
   name: 'agente inventory',
   isHidden: true
 })
 
-ipcMain.handle(NameFunction.SystemOs, async () => {
-  const systemReport = await collectSystemInfo()
-  data_device = systemReport
-  return systemReport
-})
+// ipcMain.handle(NameFunction.SystemOs, async () => {
+//   const systemReport = await collectSystemInfo()
+//   data_device = systemReport
+//   return systemReport
+// })
 
 app.whenReady().then(() => {
   createWindow()
-  
-  autoUpdater.forceDevUpdateConfig = true
-  autoUpdater.checkForUpdatesAndNotify() // Check for updates
 
-  autoUpdater.on('update-available', (info) => {
-    mainWindow.webContents.send('update_available')
-    log.info('✅ Actualización disponible:', info)
-  })
-
-  autoUpdater.on('update-downloaded', () => {
-    mainWindow.webContents.send('update_downloaded')
-    log.info('📦 Actualización descargada. Reiniciando...')
-    autoUpdater.quitAndInstall()
-  })
-
-  autoUpdater.on('checking-for-update', () => {
-    log.info('Buscando actualizaciones...')
-  })
-
-  autoUpdater.on('update-not-available', () => {
-    log.info('🚀 No hay nuevas actualizaciones.')
-  })
-
-  autoUpdater.on('error', (err) => {
-    log.error('❌ Error en autoUpdater:', err)
-  })
-
+  // Initialiti()
+  const Update = new Updater(directoryApplication, mainWindow)
+  Update.checkForUpdates()
 
   if (!isDevelopment) {
     appLauncher.isEnabled().then((isEnabled) => {
@@ -184,7 +149,7 @@ app.whenReady().then(() => {
     })
   }
 
-  setupIpcHandlers(mainWindow,data_device)
+  setupIpcHandlers(mainWindow, data_device)
 
   if (!gotTheLock) {
     app.quit()

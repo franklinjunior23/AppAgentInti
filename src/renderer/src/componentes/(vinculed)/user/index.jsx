@@ -1,12 +1,17 @@
 import React from 'react'
-import useLocalStorage from '@/hoocks/localstorage-get'
-import { GetConnectedUser } from './user.service'
-import { Skeleton } from '@/components/ui/skeleton'
-import { IconUser } from '@tabler/icons-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function UserView() {
-  const deviceId = useLocalStorage('id_device')
+ return(
+  <div>
+    User view
+  </div>
+ )
+}
+
+
+/**
+ * 
+ *  const deviceId = useLocalStorage('id_device')
   const getUser = GetConnectedUser(deviceId)
 
   if (!deviceId)
@@ -48,4 +53,4 @@ export default function UserView() {
       </CardContent>
     </Card>
   )
-}
+ */

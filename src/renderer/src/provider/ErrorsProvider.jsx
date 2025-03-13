@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -34,7 +35,11 @@ export default function ErrorProvider({ children }) {
   }, [])
 
   return (
-    <ErrorProviderContent.Provider>
+    <ErrorProviderContent.Provider
+      value={{
+        errorState
+      }}
+    >
       {children}
 
       <Dialog open={errorState} onOpenChange={() => setErrorState(false)}>

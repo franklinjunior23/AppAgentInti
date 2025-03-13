@@ -1,5 +1,4 @@
 provider: github
-updaterCacheDirName: agentinventoy-updater
 owner: franklinjunior23
 repo: AppAgentInti
 releaseType: release

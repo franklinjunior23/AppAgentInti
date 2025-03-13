@@ -1,4 +1,4 @@
-import { app, contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { NameFunction } from '../main/types'
 
@@ -16,10 +16,15 @@ const api = {
 //funcion para mandar al front la data que se recepciona en ello
 
 contextBridge.exposeInMainWorld('systemAPI', {
-
-  onUpdateAvailable: (callback) => ipcRenderer.on('update_available', callback),
-  onUpdateDownloaded: (callback) => ipcRenderer.on('update_downloaded', callback),
+  onSystemStats: (callback) => {
+    ipcRenderer.on('system-stats', (_event, data) => callback(data))
+  },
+  onUpdateAvailable: (callback) => {
+    ipcRenderer.on('update_available', (_, info) => callback(info))
+  },
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+
+  startDownload: () => ipcRenderer.send('start_download'),
 
   getInfo: () => {
     return new Promise((resolve) => {
@@ -41,6 +46,11 @@ contextBridge.exposeInMainWorld('systemAPI', {
 
   // NOTIFICATION
   getNotifications: (params) => ipcRenderer.send('get-notifications', params),
+
+  // HISTORY 
+
+  getHistory: (params = {}) => ipcRenderer.invoke('get-history', params),
+
   onNotificationsReply: (callback) =>
     ipcRenderer.on('get-notifications-reply', (event, response) => callback(response)),
 
@@ -58,7 +68,11 @@ contextBridge.exposeInMainWorld('systemAPI', {
   removeListenersNotifications: () => {
     ipcRenderer.removeAllListeners('get-notifications-reply')
     ipcRenderer.removeAllListeners('new-notification')
-  }
+  },
+  removeListenerUpdateAvailable: () => {
+    ipcRenderer.removeAllListeners('update_available')
+  },
+  removeSystemStats: (callback) => ipcRenderer.removeListener('system-stats', callback) // 🧹 Función para limpiar eventos
 })
 
 if (process.contextIsolated) {
