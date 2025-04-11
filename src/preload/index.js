@@ -44,6 +44,9 @@ contextBridge.exposeInMainWorld('systemAPI', {
   removeIdDevice: () => ipcRenderer.send('desvincule-device'),
   onErrorSystem: (callback) => ipcRenderer.on('errorSystem', (event, data) => callback(data)),
 
+  // CONFIG DATA
+  getConfig: () => ipcRenderer.invoke('get-config'),
+  saveConfig: (config  ) => ipcRenderer.invoke('save-config', config),
   // NOTIFICATION
   getNotifications: (params) => ipcRenderer.send('get-notifications', params),
 

@@ -23,7 +23,7 @@ export default function StateUsage() {
                 }}
               />
               <div className="absolute w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold">{Math.floor(cpu)}%</span>
+                <span className="text-lg font-bold text-white">{Math.floor(cpu)}%</span>
               </div>
             </div>
           </div>
@@ -39,21 +39,21 @@ export default function StateUsage() {
                 }}
               />
               <div className="absolute w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center">
-                <span className="text-lg font-bold">{Math.floor(ram)}%</span>
+                <span className="text-lg font-bold text-white">{Math.floor(ram)}%</span>
               </div>
             </div>
           </div>
         </div>
         <div className="max-w-lg mx-auto p-4">
-          <h2 className="text-xl font-semibold mb-4 text-white">💾 Almacenamiento</h2>
+          <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">💾 Almacenamiento</h2>
           <div className="flex flex-col gap-2">
             {disks.map((disk, index) => {
               const freeSpace = (parseFloat(disk.total) * (100 - parseFloat(disk.used))) / 100
               return (
-                <div key={disk.mount} className=" p-4 rounded-lg shadow-lg border">
-                  <div className="flex justify-between text-white font-medium">
-                    <span>📂 {disk.mount}</span>
-                    <span>{disk.total} GB</span>
+                <div key={disk.mount} className=" p-4 rounded-lg shadow-lg border  dark:text-white text-black">
+                  <div className="flex justify-between  font-medium">
+                    <span >📂 {disk.mount}</span>
+                    <span >{disk.total} GB</span>
                   </div>
                   <div className="w-full h-3 bg-gray-600 rounded-full mt-2 relative">
                     <div
@@ -61,7 +61,7 @@ export default function StateUsage() {
                       style={{ width: `${disk.used}%` }}
                     />
                   </div>
-                  <span className="text-gray-300 text-sm mt-1 block">
+                  <span className=" text-sm mt-1 block">
                     {freeSpace.toFixed(1)} GB disponibles de {disk.total} GB
                   </span>
                 </div>

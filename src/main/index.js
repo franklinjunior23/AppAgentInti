@@ -14,6 +14,8 @@ import setupIpcHandlers from './config/handlers/ipc-setup'
 import { Updater } from './config/auto-update'
 import { checkAndInsertHistory } from './database/query/history-query'
 import CpuMemoryUsage from './domain/cpu-memory-usage'
+import Config from './helper/get-config'
+import { startOrUpdateHeartbeat } from './crons/update-heart-interval'
 
 validateDirectory(directoryApplication)
 checkAndInsertHistory()
@@ -24,7 +26,7 @@ let data_device = null
 const notifyFrontendReply = 'errorSystem'
 const gotTheLock = app.requestSingleInstanceLock()
 
-app.disableHardwareAcceleration()
+
 
 if (isDevelopment) {
   process.env.APPIMAGE = path.join(
@@ -34,7 +36,10 @@ if (isDevelopment) {
   )
 }
 
+const configheartbeatIntervalMinutes = new Config().get().heartbeatIntervalMinutes
 
+
+startOrUpdateHeartbeat(configheartbeatIntervalMinutes)
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -133,7 +138,7 @@ const appLauncher = new AutoLaunch({
 //   data_device = systemReport
 //   return systemReport
 // })
-
+app.disableHardwareAcceleration()
 app.whenReady().then(() => {
   createWindow()
 
@@ -183,5 +188,11 @@ app.whenReady().then(() => {
       // app.isQuiting = true
       app.quit() // Quit the app when all windows are closed, except on macOS.
     }
+    console.log('window-all-closed')
+  })
+
+  app.on('before-quit', () => {
+    console.log('🔻 Cambiando estado de dispositivo (app cerrándose)...')
+    // Aquí puedes enviar una petición al servidor para actualizar el estado
   })
 })

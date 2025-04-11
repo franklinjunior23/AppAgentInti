@@ -7,6 +7,8 @@ import Config from '../../helper/get-config'
 import Logger from 'electron-log'
 import { GET_HISTORY } from '../../contants/name-history'
 import { getHistoryPaginate } from '../../database/query/history-query'
+import { ConfigurationUser } from '../../../main/contants/config-template'
+import { startOrUpdateHeartbeat } from '../../../main/crons/update-heart-interval'
 
 const sendDataDevice = 'SystemInfo'
 
@@ -35,8 +37,7 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
       id_device: data.id_device
     })
 
-    mainWindows.webContents.send(sendDataDevice, {
-      ...dataDevice,
+    configData.set({
       id_device: data.id_device
     })
 
@@ -57,6 +58,10 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
       id_device: undefined
     })
 
+    configData.set({
+      id_device: undefined
+    })
+
     sendSystemError(event, {
       title: '✅ Desconexión exitosa',
       message: 'El dispositivo se ha desconectado correctamente.',
@@ -64,10 +69,6 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     })
 
     Logger.info('Desconectando dispositivo')
-    mainWindows.webContents.send(sendDataDevice, {
-      ...data,
-      id_device: undefined
-    })
   })
   ipcMain.on(REFRESH_DEVICE, (event: IpcMainEvent) => {
     sendSystemError(event, {
@@ -82,5 +83,21 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     const { limit = 20, offset = 0 } = args
     const data = getHistoryPaginate(limit, offset)
     return data
+  })
+  ipcMain.handle('get-config', async () => {
+    const config = new Config().get()
+    return config
+  })
+
+  ipcMain.handle('save-config', async (event, newConfig: ConfigurationUser) => {
+    const config = new Config()
+
+    config.set(newConfig)
+
+    if (newConfig?.heartbeatIntervalMinutes) {
+      startOrUpdateHeartbeat(newConfig?.heartbeatIntervalMinutes)
+    }
+
+    return true
   })
 }

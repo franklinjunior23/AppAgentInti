@@ -1,18 +1,16 @@
 import Logger from 'electron-log'
 import { pathFileConfig, pathFileDbDevice } from '../contants/name-config'
 import fs from 'fs'
+import { ConfigurationUser, templateConfigurationUser } from '../contants/config-template'
 
-// 🔹 Definir el tipo de configuración
-interface ConfigData {
-  id_device?: string
-}
+
 
 export default class Config {
-  private data: ConfigData
+  private data: ConfigurationUser
   private dataDevice : null | Record <string, any>
 
   constructor() {
-    this.data = { id_device: undefined, }
+    this.data =  templateConfigurationUser
     this.dataDevice = null
     this.load()
   }
@@ -21,7 +19,7 @@ export default class Config {
     try {
       if (fs.existsSync(pathFileConfig)) {
         const dataConfig = fs.readFileSync(pathFileConfig, 'utf-8')
-        this.data = JSON.parse(dataConfig) as ConfigData
+        this.data = JSON.parse(dataConfig) as ConfigurationUser
       }
 
       if(fs.existsSync(pathFileDbDevice)){
@@ -35,16 +33,16 @@ export default class Config {
     }
   }
 
-  get(): ConfigData {
+  get(): ConfigurationUser {
     return this.data
   }
 
-  set(data: ConfigData): void {
-    this.data = data
+  set(data: Partial<ConfigurationUser>): void {
+    this.data = { ...this.data, ...data }
     this.save()
   }
 
-  update(newData: Partial<ConfigData>): void {
+  update(newData: Partial<ConfigurationUser>): void {
     this.data = { ...this.data, ...newData }
     this.save()
   }
