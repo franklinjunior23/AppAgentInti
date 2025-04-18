@@ -161,99 +161,118 @@ function Setting() {
   }, [])
 
   return (
-    <main className="mx-4">
-      <main>
-        <header className="grid-cols-[300px_190px]  grid items-end">
+    <main className="mx-4 grid grid-cols-2 ">
+      <section>
+        <main>
+          <header className="grid-cols-[300px_190px]  grid items-end">
+            <div>
+              <h3 className="font-semibold">Token de la Sucursal</h3>
+              <Input
+                readOnly={dataConfiguration?.id_device}
+                type="text"
+                onChange={(e) => setDataToken(e.target.value)}
+                value={dataConfiguration?.id_device}
+                className=" w-full mt-1 px-3 py-3 indent-1 rounded-md focus:outline-none text-sm"
+                placeholder="Introducir el token"
+              />
+            </div>
+          </header>
+          <header>
+            {dataConfiguration?.id_device ||
+              (localStorage.getItem('IdDispositivo') && (
+                <header className="flex gap-2 mt-5">
+                  <div className="grid">
+                    <label className="text-sm">Id Dispositivo</label>
+                    <Input type="text" className=" w-[100px] text-sm" readOnly value={DataToken} />
+                  </div>
+                  <div className="grid">
+                    <label className="text-sm">Empresa</label>
+                    <Input
+                      type="text"
+                      className=" text-sm"
+                      readOnly
+                      value={Data_empresa?.Empresa}
+                    />
+                  </div>
+                  <div className="grid">
+                    <label className="text-sm">Sucursal</label>
+                    <Input
+                      type="text"
+                      className=" text-sm"
+                      readOnly
+                      value={Data_empresa?.Sucursal}
+                    />
+                  </div>
+                </header>
+              ))}
+          </header>
           <div>
-            <h3 className="font-semibold">Token de la Sucursal</h3>
-            <Input
-              readOnly={dataConfiguration?.id_device}
-              type="text"
-              onChange={(e) => setDataToken(e.target.value)}
-              value={dataConfiguration?.id_device}
-              className=" w-full mt-1 px-3 py-3 indent-1 rounded-md focus:outline-none text-sm"
-              placeholder="Introducir el token"
-            />
-          </div>
-        </header>
-        <header>
-          {dataConfiguration?.id_device ||
-            (localStorage.getItem('IdDispositivo') && (
-              <header className="flex gap-2 mt-5">
-                <div className="grid">
-                  <label className="text-sm">Id Dispositivo</label>
-                  <Input type="text" className=" w-[100px] text-sm" readOnly value={DataToken} />
-                </div>
-                <div className="grid">
-                  <label className="text-sm">Empresa</label>
-                  <Input type="text" className=" text-sm" readOnly value={Data_empresa?.Empresa} />
-                </div>
-                <div className="grid">
-                  <label className="text-sm">Sucursal</label>
-                  <Input type="text" className=" text-sm" readOnly value={Data_empresa?.Sucursal} />
-                </div>
-              </header>
-            ))}
-        </header>
-        <div>
-          <Button
-            variant=""
-            disabled={Boolean(dataConfiguration?.id_device)}
-            onClick={handleDatsBack}
-            className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
-          >
-            Enviar data
-          </Button>
+            <Button
+              variant=""
+              disabled={Boolean(dataConfiguration?.id_device)}
+              onClick={handleDatsBack}
+              className="dark:bg-white  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+            >
+              Enviar data
+            </Button>
 
+            {dataConfiguration?.id_device && (
+              <Button
+                variant=""
+                onClick={() => {
+                  window.systemAPI.refreshData()
+                }}
+                className="dark:bg-white ml-3  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+              >
+                Refrescar data
+              </Button>
+            )}
+          </div>
           {dataConfiguration?.id_device && (
             <Button
               variant=""
               onClick={() => {
-                window.systemAPI.refreshData()
+                removeIdDevice()
               }}
-              className="dark:bg-white ml-3  font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+              className="dark:bg-white font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
             >
-              Refrescar data
+              Eliminar Vinculacion
             </Button>
           )}
-        </div>
-        {dataConfiguration?.id_device && (
-          <Button
-            variant=""
-            onClick={() => {
-              removeIdDevice()
-            }}
-            className="dark:bg-white font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
-          >
-            Eliminar Vinculacion
-          </Button>
-        )}
-      </main>
-      <main className="mt-2">
-        <div>
-          <h3>Intervalo Tiempo (min) </h3>
+        </main>
+        <main className="mt-2">
+          <div>
+            <h3>Intervalo Tiempo (min) </h3>
+            <Input
+              className="w-[100px]"
+              type="number"
+              value={dataConfiguration?.heartbeatIntervalMinutes}
+              onChange={(e) => {
+                const valueTime = parseInt(e.target.value, 10)
+
+                if (valueTime <= 4) return toast.error('El tiempo minimo es 4 minutos')
+
+                handleChange('heartbeatIntervalMinutes', valueTime)
+              }}
+              placeholder="Minutos"
+            />
+          </div>
+          <h3>Estado de dispositivo (Defecto)</h3>
           <Input
-            className="w-[100px]"
-            type="number"
-            value={dataConfiguration?.heartbeatIntervalMinutes}
-            onChange={(e) => {
-              const valueTime = parseInt(e.target.value, 10)
-
-              if (valueTime <= 4) return toast.error('El tiempo minimo es 4 minutos')
-
-              handleChange('heartbeatIntervalMinutes',valueTime)
-            }}
+            className="w-[200px]"
+            value={dataConfiguration?.statusDeviceDefault}
+            onChange={(e) => handleChange('statusDeviceDefault', String(e.target.value))}
             placeholder="Minutos"
           />
+        </main>
+      </section>
+      <section>
+        <h4 className='font-semibold'>Reconectar este equipo con su registro anterior</h4>
+        <div className='mt-2'>
+          <span>Codigo Dispositivo </span>
+          <Input placeholder='Ej: DEV123456' />
         </div>
-        <h3>Estado de dispositivo (Defecto)</h3>
-        <Input
-          className="w-[200px]"
-          value={dataConfiguration?.statusDeviceDefault}
-          onChange={(e) => handleChange('statusDeviceDefault', String(e.target.value))}
-          placeholder="Minutos"
-        />
-      </main>
+      </section>
     </main>
   )
 }

@@ -10,4 +10,5 @@ const templateConfigurationUser: ConfigurationUser = {
   statusDeviceDefault: 'En Buen Estado'
 }
 
+
 export { templateConfigurationUser, ConfigurationUser }

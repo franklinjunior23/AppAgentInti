@@ -47,6 +47,9 @@ contextBridge.exposeInMainWorld('systemAPI', {
   // CONFIG DATA
   getConfig: () => ipcRenderer.invoke('get-config'),
   saveConfig: (config  ) => ipcRenderer.invoke('save-config', config),
+
+  // SOFTWARE LIST 
+  getSoftwareList: () => ipcRenderer.invoke('get-software-list'),
   // NOTIFICATION
   getNotifications: (params) => ipcRenderer.send('get-notifications', params),
 

@@ -1,27 +1,39 @@
+import axios from 'axios'
 import Config from '../helper/get-config'
+import { app } from 'electron'
 
 // heartbeat.ts
 let heartbeatIntervalId: NodeJS.Timeout | null = null
 let currentHeartbeatMinutes: number | null = null
 
-const getConfig = new Config().get().id_device
+const getConfig = new Config().dataDevice
+const getConfigDevice = new Config().data
 
-function enviarHeartbeat() {
-  console.log(`✅ Enviando heartbeat...`)
-  // Aquí va la lógica para enviar al servidor
+async function enviarHeartbeat() {
+  try {
+    const { data } = await axios.post('https://dev.intisoft.com.pe/api/v1/device/heartbeat-agent', {
+      deviceId: getConfigDevice.id_device,
+      appVersion: app.getVersion(),
+      hearthbeatTime: new Config().data.heartbeatIntervalMinutes
+    })
+
+    console.log('Heartbeat enviado:', data)
+  } catch (error) {
+    console.error('Error al enviar el heartbeat:', error?.message)
+  }
 }
 
 export function startOrUpdateHeartbeat(minutes: number) {
-  if (!getConfig) return
+  if (!getConfigDevice.id_device) return
   if (!minutes || minutes <= 0) {
-    console.warn('⛔ Valor de intervalo inválido:', minutes)
+    console.warn('Valor de intervalo inválido:', minutes)
     return
   }
 
   if (minutes !== currentHeartbeatMinutes) {
     if (heartbeatIntervalId) {
       clearInterval(heartbeatIntervalId)
-      console.log('🔁 Intervalo anterior detenido')
+      console.log('Intervalo anterior detenido')
     }
 
     currentHeartbeatMinutes = minutes
@@ -36,7 +48,6 @@ export function startOrUpdateHeartbeat(minutes: number) {
       },
       minutes * 60 * 1000
     )
-
-    console.log(`⏱️ Nuevo intervalo iniciado: ${minutes} minutos`)
+    console.log(`Nuevo intervalo iniciado: ${minutes} minutos`)
   }
 }

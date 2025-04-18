@@ -16,13 +16,14 @@ import { checkAndInsertHistory } from './database/query/history-query'
 import CpuMemoryUsage from './domain/cpu-memory-usage'
 import Config from './helper/get-config'
 import { startOrUpdateHeartbeat } from './crons/update-heart-interval'
+import { changesDeviceInit } from './config/history/changes'
 
 validateDirectory(directoryApplication)
 checkAndInsertHistory()
 
 let mainWindow
 let data_device = null
-
+changesDeviceInit()
 const notifyFrontendReply = 'errorSystem'
 const gotTheLock = app.requestSingleInstanceLock()
 

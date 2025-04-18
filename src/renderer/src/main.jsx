@@ -17,6 +17,7 @@ import Layaout from './layaout/default'
 import ErrorProvider from './provider/ErrorsProvider'
 import NotificationProver from './provider/notification-provider'
 import Info from './screen/Info'
+import SoftwarePage from './screen/software'
 
 const queryClient = new QueryClient()
 
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   <Route path="/Setting" element={<Setting />} />
                   <Route path="/history" element={<History />} />
                   <Route path="/Support" element={<Support />} />
+                  <Route path="/Software" element={<SoftwarePage />} />
                   <Route path="/help" element={<Info />} />
                 </Route>
               </Routes>
