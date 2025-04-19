@@ -1,7 +1,7 @@
 import { autoUpdater } from 'electron-updater'
 import log from 'electron-log'
 import { join } from 'path'
-import { BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
 export class Updater {
 
@@ -62,7 +62,7 @@ export class Updater {
     })
 
     ipcMain.on('start_download', () => {
-     
+     app.quit()
      autoUpdater.downloadUpdate()
     })
   }
