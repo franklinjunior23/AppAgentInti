@@ -1,18 +1,31 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { AxiosRest } from '../helpers/ApiConfig'
 import { DataInformationPC } from '../store'
 import { toast } from 'react-toastify'
 import { useDataSystem } from '../store/Use-data-system'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { UseAuthDevice } from '@/hoocks/UseRegister-Device'
 import { CpuBrand, isVerifiyDevice } from '@/helpers/types-setting'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
+import { set } from 'react-hook-form'
 
 function Setting() {
   const { datainformation } = useDataSystem()
   const [DataToken, setDataToken] = useState(localStorage.getItem('TokenSucursal') ?? '')
-
+  const [detailsEliminate, setDetailsEliminate] = useState(false)
+  const [dataDetailEliminate, setDataDetailEliminate] = useState({
+    description: ''
+  })
+  const [codeDeviceRecovery, setCodeDeviceRecovery] = useState('')
   const [dataConfiguration, setDataConfiguration] = useState()
 
   useEffect(() => {
@@ -24,12 +37,18 @@ function Setting() {
     })
   }, [])
 
-  const { data, AddDispositivoId, iDDispositivo, CloseOpenAuth, TrueOpenAuth } = DataInformationPC()
+  const textareaRef = useRef(null)
+
+  useEffect(() => {
+    if (detailsEliminate) {
+      // Pequeño delay para asegurar que el modal está montado
+      setTimeout(() => {
+        textareaRef.current?.focus()
+      }, 100)
+    }
+  }, [detailsEliminate])
 
   const Data_empresa = JSON.parse(localStorage.getItem('Data_Empresa') ?? null)
-
-  // Auth import
-  const { mutate: MutateAuth, isLoading: LoadingAuth } = UseAuthDevice()
 
   const handleChange = (key, value) => {
     const updatedConfig = { ...dataConfiguration, [key]: value }
@@ -124,26 +143,35 @@ function Setting() {
       toast.error('Error al enviar los datos' + error?.message)
     }
   }
-  function HandleDeleteToken() {
-    CloseOpenAuth()
-    localStorage.removeItem('TokenSucursal')
-    localStorage.removeItem('id_device')
-    localStorage.removeItem('Data_Empresa')
-    AddDispositivoId(0)
-    return alert('Token Borrado')
-  }
 
   function removeIdDevice() {
     const confirmed = window.confirm(
       '¿Estás seguro de que deseas borrar la vinculación del dispositivo?'
     )
     if (!confirmed) return
+
+    setDetailsEliminate(true)
+  }
+
+  function handleUnlickDevice() {
+    const detailsUnlick = {
+      description: dataDetailEliminate.description,
+      deviceId: dataConfiguration?.id_device,
+      action: 'Desvincular Agente'
+    }
+
+    setDetailsEliminate(false)
     // Lógica para borrar la vinculación
     alert('La vinculación ha sido eliminada.')
     window.systemAPI.removeIdDevice()
     handleChange('id_device', null)
-
     localStorage.removeItem('id_device')
+  }
+
+  async function recoveryConection() {
+    const { data } = await AxiosRest.post('/device/recovery', {
+      codeDevice: codeDeviceRecovery
+    })
   }
 
   useEffect(() => {
@@ -267,12 +295,58 @@ function Setting() {
         </main>
       </section>
       <section>
-        <h4 className='font-semibold'>Reconectar este equipo con su registro anterior</h4>
-        <div className='mt-2'>
+        <h4 className="font-semibold">Reconectar este equipo con su registro anterior</h4>
+        <div className="mt-2">
           <span>Codigo Dispositivo </span>
-          <Input placeholder='Ej: DEV123456' />
+          <Input
+            placeholder="Ej: DEV123456"
+            value={codeDeviceRecovery}
+            onChange={(e) => {
+              setCodeDeviceRecovery(e.target.value)
+            }}
+          />
+          <Button
+            type="button"
+            onClick={recoveryConection}
+            className="dark:bg-white font-semibold mt-5 px-5 py-3 indent-1 rounded-md focus:outline-none text-sm"
+          >
+            Reconectar
+          </Button>
         </div>
       </section>
+      <Dialog open={detailsEliminate} onOpenChange={setDetailsEliminate}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Motivo de la eliminacion</DialogTitle>
+            <DialogDescription>
+              Por favor, proporciona una breve descripcion del motivo de la eliminacion.
+            </DialogDescription>
+          </DialogHeader>
+          <section>
+            <textarea
+              ref={textareaRef}
+              className="w-full rounded-lg p-2 text-black  h-[200px] resize-none focus:outline-none"
+              value={dataDetailEliminate.description}
+              onChange={(e) =>
+                setDataDetailEliminate((prev) => ({
+                  ...prev,
+                  description: e.target.value
+                }))
+              }
+            />
+          </section>
+          <DialogFooter>
+            <Button type="button" onClick={handleUnlickDevice}>
+              Confirmar eliminacion
+            </Button>
+            <DialogClose asChild>
+              <Button type="button" variant="secondary">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

@@ -101,7 +101,7 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     return true
   })
 
-  // SOFTWARE LIST 
+  // SOFTWARE LIST
   ipcMain.handle('get-software-list', async () => {
     const softwareList = new Config().dataSoftware
     return softwareList

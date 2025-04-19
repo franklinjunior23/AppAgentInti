@@ -6,7 +6,6 @@ import { app } from 'electron'
 let heartbeatIntervalId: NodeJS.Timeout | null = null
 let currentHeartbeatMinutes: number | null = null
 
-const getConfig = new Config().dataDevice
 const getConfigDevice = new Config().data
 
 async function enviarHeartbeat() {
@@ -24,7 +23,7 @@ async function enviarHeartbeat() {
 }
 
 export function startOrUpdateHeartbeat(minutes: number) {
-  if (!getConfigDevice.id_device) return
+  if (!new Config().data.id_device) return
   if (!minutes || minutes <= 0) {
     console.warn('Valor de intervalo inválido:', minutes)
     return
