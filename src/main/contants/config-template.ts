@@ -7,7 +7,7 @@ interface ConfigurationUser {
 const templateConfigurationUser: ConfigurationUser = {
   id_device: null,
   heartbeatIntervalMinutes: 5,
-  statusDeviceDefault: 'En Buen Estado'
+  statusDeviceDefault: 'Disponible'
 }
 
 

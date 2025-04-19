@@ -27,8 +27,6 @@ changesDeviceInit()
 const notifyFrontendReply = 'errorSystem'
 const gotTheLock = app.requestSingleInstanceLock()
 
-
-
 if (isDevelopment) {
   process.env.APPIMAGE = path.join(
     __dirname,
@@ -38,8 +36,6 @@ if (isDevelopment) {
 }
 
 const configheartbeatIntervalMinutes = new Config().get().heartbeatIntervalMinutes
-
-
 startOrUpdateHeartbeat(configheartbeatIntervalMinutes)
 
 function createWindow() {
@@ -140,60 +136,66 @@ const appLauncher = new AutoLaunch({
 //   return systemReport
 // })
 app.disableHardwareAcceleration()
-app.whenReady().then(() => {
-  createWindow()
+if (!gotTheLock) {
+  // Cierra la segunda instancia
+  app.quit()
+} else {
+  // ✅ Esta es la instancia principal
+  app.whenReady().then(() => {
+    createWindow()
 
-  // Initialiti()
-  const Update = new Updater(directoryApplication, mainWindow)
-  Update.checkForUpdates()
+    // Initialiti()
+    const Update = new Updater(directoryApplication, mainWindow)
+    Update.checkForUpdates()
 
-  if (!isDevelopment) {
-    appLauncher.isEnabled().then((isEnabled) => {
-      if (!isEnabled) {
-        appLauncher.enable()
-      }
-    })
-  }
-
-  setupIpcHandlers(mainWindow, data_device)
-
-  if (!gotTheLock) {
-    app.quit()
-  } else {
-    app.on('second-instance', () => {
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore()
-        mainWindow.show()
-        mainWindow.focus()
-      }
-    })
-  }
-
-  electronApp.setAppUserModelId('com.intiscorp.agentinventory')
-
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-
-  app.on('window-all-closed', function () {
-    if (process.platform !== 'darwin') {
-      // app.isQuiting = true
-      app.quit() // Quit the app when all windows are closed, except on macOS.
+    if (!isDevelopment) {
+      appLauncher.isEnabled().then((isEnabled) => {
+        if (!isEnabled) {
+          appLauncher.enable()
+        }
+      })
     }
-    console.log('window-all-closed')
-  })
 
-  app.on('before-quit', () => {
-    console.log('🔻 Cambiando estado de dispositivo (app cerrándose)...')
-    // Aquí puedes enviar una petición al servidor para actualizar el estado
+    setupIpcHandlers(mainWindow, data_device)
+
+    if (!gotTheLock) {
+      app.quit()
+    } else {
+      app.on('second-instance', () => {
+        if (mainWindow) {
+          if (mainWindow.isMinimized()) mainWindow.restore()
+          mainWindow.show()
+          mainWindow.focus()
+        }
+      })
+    }
+
+    electronApp.setAppUserModelId('com.intiscorp.agentinventory')
+
+    // Default open or close DevTools by F12 in development
+    // and ignore CommandOrControl + R in production.
+    // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+    app.on('browser-window-created', (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+    })
+
+    app.on('activate', function () {
+      // On macOS it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+
+    app.on('window-all-closed', function () {
+      if (process.platform !== 'darwin') {
+        // app.isQuiting = true
+        app.quit() // Quit the app when all windows are closed, except on macOS.
+      }
+      console.log('window-all-closed')
+    })
+
+    app.on('before-quit', () => {
+      console.log('🔻 Cambiando estado de dispositivo (app cerrándose)...')
+      // Aquí puedes enviar una petición al servidor para actualizar el estado
+    })
   })
-})
+}
