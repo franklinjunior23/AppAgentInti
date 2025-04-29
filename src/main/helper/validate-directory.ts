@@ -1,5 +1,5 @@
 import fs from 'fs'
-import { directoryApplication, pathFileConfig, pathFileDbConfig } from '../contants/name-config'
+import { directoryApplication, pathChangesFolder, pathFileConfig, pathFileDbConfig } from '../contants/name-config'
 import Config from './get-config'
 import Logger from 'electron-log'
 import { templateConfigurationUser } from '../contants/config-template'
@@ -18,6 +18,9 @@ export async function validateDirectory(directory: string) {
       fs.mkdirSync(directory, { recursive: true })
 
       Logger.info('Directorio creado correctamente')
+    }
+    if(!fs.existsSync(pathChangesFolder)) {
+      fs.mkdirSync(pathChangesFolder, { recursive: true })
     }
 
     if (!fs.existsSync(pathFileConfig)) {

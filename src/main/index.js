@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, Notification } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -14,16 +14,17 @@ import setupIpcHandlers from './config/handlers/ipc-setup'
 import { Updater } from './config/auto-update'
 import { checkAndInsertHistory } from './database/query/history-query'
 import CpuMemoryUsage from './domain/cpu-memory-usage'
-import Config from './helper/get-config'
-import { startOrUpdateHeartbeat } from './crons/update-heart-interval'
 import { changesDeviceInit } from './config/history/changes'
+import { sendHeartbeat } from './crons/get-heartbeath'
+
 
 validateDirectory(directoryApplication)
 checkAndInsertHistory()
 
 let mainWindow
 let data_device = null
-changesDeviceInit()
+
+
 const notifyFrontendReply = 'errorSystem'
 const gotTheLock = app.requestSingleInstanceLock()
 
@@ -34,9 +35,7 @@ if (isDevelopment) {
     `Installar_Mapeo_${app.getVersion()}_linux.AppImage`
   )
 }
-
-const configheartbeatIntervalMinutes = new Config().get().heartbeatIntervalMinutes
-startOrUpdateHeartbeat(configheartbeatIntervalMinutes)
+sendHeartbeat()
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -143,7 +142,7 @@ if (!gotTheLock) {
   // ✅ Esta es la instancia principal
   app.whenReady().then(() => {
     createWindow()
-
+    changesDeviceInit()
     // Initialiti()
     const Update = new Updater(directoryApplication, mainWindow)
     Update.checkForUpdates()
@@ -190,12 +189,12 @@ if (!gotTheLock) {
         // app.isQuiting = true
         app.quit() // Quit the app when all windows are closed, except on macOS.
       }
-      console.log('window-all-closed')
     })
 
     app.on('before-quit', () => {
       console.log('🔻 Cambiando estado de dispositivo (app cerrándose)...')
       // Aquí puedes enviar una petición al servidor para actualizar el estado
     })
+
   })
 }

@@ -18,6 +18,7 @@ import ErrorProvider from './provider/ErrorsProvider'
 import NotificationProver from './provider/notification-provider'
 import Info from './screen/Info'
 import SoftwarePage from './screen/software'
+import PageChanges from './screen/Changes'
 
 const queryClient = new QueryClient()
 
@@ -37,6 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   <Route path="/Support" element={<Support />} />
                   <Route path="/Software" element={<SoftwarePage />} />
                   <Route path="/help" element={<Info />} />
+                  <Route path="/list-changes" element={<PageChanges />} />
                 </Route>
               </Routes>
             </Router>

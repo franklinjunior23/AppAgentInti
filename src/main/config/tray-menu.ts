@@ -44,6 +44,6 @@ export function createTray(mainWindow, icon) {
     }
   ])
 
-  tray.setToolTip('AgentInventory')
+  tray.setToolTip('agente intisoft')
   tray.setContextMenu(contextMenu)
 }

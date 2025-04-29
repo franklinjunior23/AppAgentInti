@@ -1,4 +1,6 @@
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { RefreshCw } from 'lucide-react'
 import React from 'react'
 import { useEffect, useState } from 'react'
 
@@ -54,8 +56,7 @@ export default function SoftwarePage() {
     .filter(
       (item) =>
         // item.InstallLocation !== null ||
-        item.InstallLocation !== undefined 
-        && item?.InstallLocation !== ''
+        item.InstallLocation !== undefined && item?.InstallLocation !== ''
     )
     .sort((a, b) => {
       const yearA = a.InstallDate?.slice(0, 4)
@@ -76,12 +77,16 @@ export default function SoftwarePage() {
   return (
     <main>
       <h1>Software List</h1>
-      <header className="mt-2 w-[300px]">
+      <header className="mt-2  flex justify-between items-center">
         <Input
           placeholder="Buscar por nombre de software"
           onChange={handleSearchChange}
           value={searchName}
+          className={'w-[300px]'}
         />
+        <Button variant="icon">
+          <RefreshCw className="size-5" />
+        </Button>
       </header>
       <section>
         <div className="space-y-4">

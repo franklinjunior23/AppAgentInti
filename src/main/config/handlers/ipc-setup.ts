@@ -6,11 +6,15 @@ import { sendSystemError } from '../../helper/error'
 import Config from '../../helper/get-config'
 import Logger from 'electron-log'
 import { GET_HISTORY } from '../../contants/name-history'
-import { getHistoryPaginate } from '../../database/query/history-query'
+import { CreateHistory, getHistoryPaginate } from '../../database/query/history-query'
 import { ConfigurationUser } from '../../../main/contants/config-template'
-import { startOrUpdateHeartbeat } from '../../../main/crons/update-heart-interval'
-
-const sendDataDevice = 'SystemInfo'
+import fs from 'fs'
+import {
+  directoryApplication,
+  pathChangesFolder,
+  pathFileConfig
+} from '../../../main/contants/name-config'
+import { changesDeviceInit } from '../history/changes'
 
 export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice): void {
   ipcMain.on(GET_NOTIFICATION, (event: IpcMainEvent, args) => {
@@ -37,25 +41,24 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
       id_device: data.id_device
     })
 
-    configData.set({
-      id_device: data.id_device
-    })
-
     sendSystemError(event, {
       title: '✅ Conexión exitosa',
       message: 'El dispositivo se ha conectado correctamente.',
       success: true
     })
+    CreateHistory({
+      description: `El dispositivo se conectó exitosamente a una sucursal del sistema. A partir de este momento, podrá acceder y utilizar todas las funcionalidades asociadas a esta sede.`,
+      title: `✅ Vinculación de dispositivo completada`
+    })
 
-    Logger.info('Conectando dispositivo correctamente')
+    Logger.info('Conectando dispositivo correctamente :' + new Date())
   })
 
   ipcMain.on(UNLINK_DEVICE, (event: IpcMainEvent) => {
     const configData = new Config()
-
-    const data = new Config().getDeviceData()
     configData.update({
-      id_device: undefined
+      id_device: undefined,
+      updatedHeartbeat: null
     })
 
     configData.set({
@@ -67,8 +70,12 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
       message: 'El dispositivo se ha desconectado correctamente.',
       success: true
     })
+    CreateHistory({
+      description: `El dispositivo se desconectó correctamente del sistema. A partir de ahora, ya no estará vinculado ni podrá interactuar con las funciones disponibles hasta que se vuelva a registrar.`,
+      title: `✅ Desvinculación de dispositivo exitosa`
+    })
 
-    Logger.info('Desconectando dispositivo')
+    Logger.info('Desconectando dispositivo :' + new Date())
   })
   ipcMain.on(REFRESH_DEVICE, (event: IpcMainEvent) => {
     sendSystemError(event, {
@@ -92,11 +99,7 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
   ipcMain.handle('save-config', async (event, newConfig: ConfigurationUser) => {
     const config = new Config()
 
-    config.set(newConfig)
-
-    if (newConfig?.heartbeatIntervalMinutes) {
-      startOrUpdateHeartbeat(newConfig?.heartbeatIntervalMinutes)
-    }
+    config.update({ ...config.data, ...newConfig })
 
     return true
   })
@@ -106,4 +109,67 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     const softwareList = new Config().dataSoftware
     return softwareList
   })
+
+  ipcMain.handle('delete-list-data', async () => {
+    fs.unlink(directoryApplication + '/installed-software.json', (err) => {
+      if (err) {
+        Logger.error('Error al eliminar el archivo:', err.message)
+        return false
+      }
+      Logger.info('Archivo eliminado correctamente')
+    })
+
+    fs.unlink(pathFileConfig, (err) => {
+      if (err) {
+        Logger.error('Error al eliminar el archivo:', err.message)
+        return false
+      }
+      Logger.info('Archivo eliminado correctamente')
+    })
+
+    CreateHistory({
+      title: 'Eliminacion de archivo de configuracion',
+      description:
+        'Se elimino el archivo de configuracion del dispositivo, se recomienda reiniciar la aplicacion para que se genere un nuevo archivo de configuracion.'
+    })
+
+    app.isQuitting = true
+    app.quit()
+  })
+    // UPDATE CHANGES
+
+  ipcMain.handle('refresh-changes', async () => {
+    changesDeviceInit()
+  })
+
+  ipcMain.handle('get-changes-device', async () => {
+    return fs.readdirSync(pathChangesFolder)
+  })
+
+  ipcMain.handle('read-file-changes', async (event: IpcMainEvent, fileName: string) => {
+    const filePath = pathChangesFolder + `/${fileName}`
+    if (!fs.existsSync(filePath)) {
+      sendSystemError(event, {
+        title: '⚠️ Error de lectura',
+        message: 'El archivo no existe.',
+        success: false
+      })
+      return null
+    }
+    try {
+      const data = fs.readFileSync(filePath, 'utf-8')
+      return JSON.parse(data)
+    } catch (err) {
+      sendSystemError(event, {
+        title: '⚠️ Error de lectura',
+        message: 'Error al leer el archivo.',
+        success: false
+      })
+      Logger.error('Error al leer el archivo:', err?.message)
+      return null
+    }
+  })
+
+
+
 }

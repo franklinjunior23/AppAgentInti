@@ -10,3 +10,4 @@ export const pathFileConfig = path.join(directoryApplication, 'configUserConfig.
 export const pathFileDbConfig = path.join(directoryApplication, 'database_device.db')
 export const pathFileDbDevice = path.join(directoryApplication, 'device-data.json')
 export const pathFileSoftwareList = path.join(directoryApplication, 'installed-software.json')
+export const pathChangesFolder = path.join(directoryApplication, 'changes')

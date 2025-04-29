@@ -17,9 +17,10 @@ export function getNotificationPaginate(event: IpcMainEvent, limit = 20, offset 
   })
 }
 
+
 // 🔹 Insertar una nueva notificación
 export function creatNotification(
-  event: IpcMainEvent,
+  event: IpcMainEvent | undefined,
   data: { title: string; message: string; type: string }
 ) {
   const query = `INSERT INTO notifications (title, message, type) VALUES (?, ?, ?)`
@@ -28,12 +29,17 @@ export function creatNotification(
   db.run(query, params, function (err) {
     if (err) {
       Logger.error('Error al crear notificación:', err.message)
-      return sendSystemError(event, {
-        title: 'Error al crear notificación',
-        message: err.message,
-        success: false
-      })
+      if (event) {
+        sendSystemError(event, {
+          title: '❌ Error al crear notificación',
+          message: 'No se pudo crear la notificación.',
+          success: false
+        })
+      }
     }
-    event.reply(GET_NOTIFICATION_REPLY, { message: 'Notificación creada' })
+
+    if (event) {
+      event.reply(GET_NOTIFICATION_REPLY, { message: 'Notificación creada' })
+    }
   })
 }

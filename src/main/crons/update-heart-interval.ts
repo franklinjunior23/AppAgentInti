@@ -10,7 +10,7 @@ const getConfigDevice = new Config().data
 
 async function enviarHeartbeat() {
   try {
-    const { data } = await axios.post('https://dev.intisoft.com.pe/api/v1/device/heartbeat-agent', {
+    const { data } = await axios.post('ee', {
       deviceId: getConfigDevice.id_device,
       appVersion: app.getVersion(),
       hearthbeatTime: new Config().data.heartbeatIntervalMinutes

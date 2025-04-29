@@ -16,15 +16,33 @@ const api = {
 //funcion para mandar al front la data que se recepciona en ello
 
 contextBridge.exposeInMainWorld('systemAPI', {
+  // CHANGES FOR DEVICE
+  refreshChanges : () => ipcRenderer.invoke('refresh-changes'),
+
+  getListChanges: () => ipcRenderer.invoke('get-changes-device'),
+  readFileChanges: (filePath) => {
+    return ipcRenderer.invoke('read-file-changes', filePath)
+  },
   onSystemStats: (callback) => {
     ipcRenderer.on('system-stats', (_event, data) => callback(data))
   },
   onUpdateAvailable: (callback) => {
     ipcRenderer.on('update_available', (_, info) => callback(info))
   },
+
+  onUpdateProgress: (callback) => {
+    ipcRenderer.on('update_progress', (_, info) => callback(info))
+  },
+  onUpdateDownload: (callback) => {
+    ipcRenderer.on('update_downloaded', (_, info) => callback(info))
+  },
+  startDownload: () => ipcRenderer.send('start_download'),
+
+  startInstallUpdate: () => ipcRenderer.send('start_install_update'),
+
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
-  startDownload: () => ipcRenderer.send('start_download'),
+  deleteSoftware: () => ipcRenderer.invoke('delete-list-data'),
 
   getInfo: () => {
     return new Promise((resolve) => {
@@ -46,14 +64,14 @@ contextBridge.exposeInMainWorld('systemAPI', {
 
   // CONFIG DATA
   getConfig: () => ipcRenderer.invoke('get-config'),
-  saveConfig: (config  ) => ipcRenderer.invoke('save-config', config),
+  saveConfig: (config) => ipcRenderer.invoke('save-config', config),
 
-  // SOFTWARE LIST 
+  // SOFTWARE LIST
   getSoftwareList: () => ipcRenderer.invoke('get-software-list'),
   // NOTIFICATION
   getNotifications: (params) => ipcRenderer.send('get-notifications', params),
 
-  // HISTORY 
+  // HISTORY
 
   getHistory: (params = {}) => ipcRenderer.invoke('get-history', params),
 
@@ -71,12 +89,16 @@ contextBridge.exposeInMainWorld('systemAPI', {
   removeErrorSystemListener: () => {
     ipcRenderer.removeAllListeners('errorSystem')
   },
+
   removeListenersNotifications: () => {
     ipcRenderer.removeAllListeners('get-notifications-reply')
     ipcRenderer.removeAllListeners('new-notification')
   },
   removeListenerUpdateAvailable: () => {
     ipcRenderer.removeAllListeners('update_available')
+  },
+  removeListenerUpdateProgress: () => {
+    ipcRenderer.removeAllListeners('update_progress')
   },
   removeSystemStats: (callback) => ipcRenderer.removeListener('system-stats', callback) // 🧹 Función para limpiar eventos
 })
