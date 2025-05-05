@@ -21,7 +21,7 @@ import SoftwarePage from './screen/software'
 import PageChanges from './screen/Changes'
 
 const queryClient = new QueryClient()
-
+console.log(import.meta.env.VITE_API_DOMAIN)
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ErrorProvider>
     <NotificationProver>

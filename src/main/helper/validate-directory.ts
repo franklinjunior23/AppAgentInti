@@ -1,19 +1,10 @@
 import fs from 'fs'
-import { directoryApplication, pathChangesFolder, pathFileConfig, pathFileDbConfig } from '../contants/name-config'
+import {  pathChangesFolder, pathFileConfig, pathFileDbConfig } from '../contants/name-config'
 import Config from './get-config'
 import Logger from 'electron-log'
 import { templateConfigurationUser } from '../contants/config-template'
-import { getAllInstalledSoftware } from 'fetch-installed-software/win32'
 export async function validateDirectory(directory: string) {
   try {
-    const data = await getAllInstalledSoftware()
-
-    fs.writeFileSync(
-      `${directoryApplication}/installed-software.json`,
-      JSON.stringify(data, null, 2),
-      'utf-8'
-    )
-
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory, { recursive: true })
 

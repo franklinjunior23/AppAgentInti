@@ -228,6 +228,12 @@ export async function changesMemory() {
     })
     .filter(Boolean)
 
+    console.log({
+      newMemory,
+      removedMemory,
+      updatedMemory
+    })
+
   return {
     name: 'ram',
     previous: previousModules,
@@ -238,6 +244,7 @@ export async function changesMemory() {
       updatedMemory
     }
   }
+  
 }
 
 /**

@@ -20,7 +20,23 @@ function Setting() {
   const [dataDetailEliminate, setDataDetailEliminate] = useState({
     description: ''
   })
+  const [software, setSoftware] = useState([])
+  const [loading, setLoading] = useState(true)
   const [dataConfiguration, setDataConfiguration] = useState()
+
+  const fetchSoftware = async () => {
+    try {
+      const data = await window.systemAPI.getSoftwareList()
+      setSoftware(data)
+    } catch (error) {
+      console.error('Error fetching software list:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    fetchSoftware()
+  }, [])
 
   useEffect(() => {
     window.systemAPI.getConfig().then((data) => {
@@ -110,12 +126,24 @@ function Setting() {
           type: item.type ?? 'No disponible',
           capacity: item.size ?? 0,
           speed: item.clockSpeed
-        }))
+        })),
+        applications: software
+          ?.filter((item) => item.InstallLocation !== undefined && item?.InstallLocation !== '')
+          ?.map((item) => ({
+            displayName: item?.DisplayName || 'No disponible',
+            name: item?.DisplayName || 'No disponible',
+            registryDirName: item?.RegistryDirName || 'No disponible',
+            installLocation: item?.InstallLocation || 'No disponible',
+            uninstallLocation: item?.UninstallString || 'No disponible',
+            version: item?.DisplayVersion || '0.0.0',
+            installDate: item?.InstallDate && !isNaN(new Date(item?.InstallDate).getTime()) 
+              ? new Date(item?.InstallDate) 
+              : new Date(),
+            publisher: item?.Publisher || 'No disponible',
+            helpLink: item?.HelpLink || 'No disponible',
+            displayVersion: item?.DisplayVersion || 'No disponible',
+          }))
       })
-
-      if (DataApi?.company) {
-        ;('')
-      }
 
       window.systemAPI.sendSignDevice({
         id_device: DataApi.id_device
@@ -200,41 +228,6 @@ function Setting() {
                   <label htmlFor="changuesDevice">Historial de cambio</label>
                 </div>
               </section>
-
-              {/* <header>
-                {dataConfiguration?.id_device ||
-                  (localStorage.getItem('IdDispositivo') && (
-                    <header className="flex gap-2 mt-5">
-                      <div className="grid">
-                        <label className="text-sm">Id Dispositivo</label>
-                        <Input
-                          type="text"
-                          className=" w-[100px] text-sm"
-                          readOnly
-                          value={DataToken}
-                        />
-                      </div>
-                      <div className="grid">
-                        <label className="text-sm">Empresa</label>
-                        <Input
-                          type="text"
-                          className=" text-sm"
-                          readOnly
-                          value={Data_empresa?.Empresa}
-                        />
-                      </div>
-                      <div className="grid">
-                        <label className="text-sm">Sucursal</label>
-                        <Input
-                          type="text"
-                          className=" text-sm"
-                          readOnly
-                          value={Data_empresa?.Sucursal}
-                        />
-                      </div>
-                    </header>
-                  ))}
-              </header> */}
               <div className="flex gap-2 mt-3">
                 <Button
                   variant="default"
@@ -272,22 +265,6 @@ function Setting() {
               </div>
             </main>
             <main className="mt-10 border-t pt-5 flex justify-between items-center">
-              {/* <div>
-                <h3>Intervalo Tiempo (min) </h3>
-            <Input
-              className="w-[100px]"
-              type="number"
-              value={dataConfiguration?.heartbeatIntervalMinutes}
-              onChange={(e) => {
-                const valueTime = parseInt(e.target.value, 10)
-
-                if (valueTime <= 4) return toast.error('El tiempo minimo es 4 minutos')
-
-                handleChange('heartbeatIntervalMinutes', valueTime)
-              }}
-              placeholder="Minutos"
-            />
-              </div> */}
               <h3>Estado de dispositivo (Defecto)</h3>
               <Input
                 className="w-[200px]"
@@ -300,7 +277,12 @@ function Setting() {
           </CardContent>
         </Card>
       </main>
-      <RecoveryDevice />
+      {!dataConfiguration?.id_device && (
+        <RecoveryDevice
+          dataConfiguration={dataConfiguration}
+          setDataConfiguration={setDataConfiguration}
+        />
+      )}
       <UnlickDeviceModal
         open={detailsEliminate}
         setOpen={setDetailsEliminate}

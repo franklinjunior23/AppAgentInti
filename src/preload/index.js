@@ -17,7 +17,10 @@ const api = {
 
 contextBridge.exposeInMainWorld('systemAPI', {
   // CHANGES FOR DEVICE
-  refreshChanges : () => ipcRenderer.invoke('refresh-changes'),
+
+  getEnvVariable: (key) => ipcRenderer.invoke('get-env-variable', key),
+
+  refreshChanges: () => ipcRenderer.invoke('refresh-changes'),
 
   getListChanges: () => ipcRenderer.invoke('get-changes-device'),
   readFileChanges: (filePath) => {
@@ -43,6 +46,8 @@ contextBridge.exposeInMainWorld('systemAPI', {
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 
   deleteSoftware: () => ipcRenderer.invoke('delete-list-data'),
+
+  refreshSoftwareList: () => ipcRenderer.invoke('refresh-software-list'),
 
   getInfo: () => {
     return new Promise((resolve) => {

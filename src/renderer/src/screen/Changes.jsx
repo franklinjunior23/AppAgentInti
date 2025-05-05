@@ -44,7 +44,7 @@ export default function PageChanges() {
 
   return (
     <div className="grid grid-cols-[230px_545px] overflow-hidden gap-4">
-      <ul className='border-r'>
+      <ul className="border-r">
         {dataListChanges.map((item, index) => {
           return (
             <li

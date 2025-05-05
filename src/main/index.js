@@ -15,15 +15,15 @@ import { Updater } from './config/auto-update'
 import { checkAndInsertHistory } from './database/query/history-query'
 import CpuMemoryUsage from './domain/cpu-memory-usage'
 import { changesDeviceInit } from './config/history/changes'
-import { sendHeartbeat } from './crons/get-heartbeath'
+import { heartBeath, sendHeartbeat } from './crons/get-heartbeath'
+import { initGetSoftwareList } from './domain/get-software-list'
 
-
+initGetSoftwareList()
 validateDirectory(directoryApplication)
 checkAndInsertHistory()
-
+heartBeath()
 let mainWindow
 let data_device = null
-
 
 const notifyFrontendReply = 'errorSystem'
 const gotTheLock = app.requestSingleInstanceLock()
@@ -195,6 +195,5 @@ if (!gotTheLock) {
       console.log('🔻 Cambiando estado de dispositivo (app cerrándose)...')
       // Aquí puedes enviar una petición al servidor para actualizar el estado
     })
-
   })
 }

@@ -12,9 +12,12 @@ import fs from 'fs'
 import {
   directoryApplication,
   pathChangesFolder,
-  pathFileConfig
+  pathFileConfig,
+  pathFileDbDevice
 } from '../../../main/contants/name-config'
 import { changesDeviceInit } from '../history/changes'
+import { getSoftwareList } from '../../../main/domain/get-software-list'
+import 'dotenv/config'
 
 export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice): void {
   ipcMain.on(GET_NOTIFICATION, (event: IpcMainEvent, args) => {
@@ -118,7 +121,13 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
       }
       Logger.info('Archivo eliminado correctamente')
     })
-
+    fs.unlink(pathFileDbDevice, (err) => {
+      if (err) {
+        Logger.error('Error al eliminar el archivo:', err.message)
+        return false
+      }
+      Logger.info('Archivo eliminado correctamente')
+    })
     fs.unlink(pathFileConfig, (err) => {
       if (err) {
         Logger.error('Error al eliminar el archivo:', err.message)
@@ -136,7 +145,7 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     app.isQuitting = true
     app.quit()
   })
-    // UPDATE CHANGES
+  // UPDATE CHANGES
 
   ipcMain.handle('refresh-changes', async () => {
     changesDeviceInit()
@@ -170,6 +179,12 @@ export default function setupIpcHandlers(mainWindows: BrowserWindow, dataDevice)
     }
   })
 
+  ipcMain.handle('refresh-software-list', async () => {
+    await getSoftwareList() 
+    return true
+  })
 
-
+  ipcMain.handle('get-env-variable', (event, key) => {
+    return process.env[key] || null;
+  });
 }
